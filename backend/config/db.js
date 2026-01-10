@@ -31,6 +31,17 @@ const initDB = async () => {
       )
     `);
 
+    // robot_positions log
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS robot_positions (
+        id SERIAL PRIMARY KEY,
+        robot_id INT REFERENCES robots(id) ON DELETE CASCADE,
+        lat DECIMAL(10, 7) NOT NULL,
+        lon DECIMAL(10, 7) NOT NULL,
+        recorded_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+
     // test user
     const bcrypt = require("bcrypt");
     const hashedPassword = await bcrypt.hash("test123", 10);

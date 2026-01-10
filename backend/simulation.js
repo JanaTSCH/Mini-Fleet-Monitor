@@ -1,7 +1,20 @@
 const { pool } = require("./config/db");
+const redis = require("redis");
 
-const startSimulation = (io) => {
-  setInterval(async () => {
+let redisClient;
+let simulationInterval;
+let isRunning = false;
+
+const startSimulation = async (io) => {
+  redisClient = redis.createClient({
+    url: process.env.REDIS_URL,
+  });
+
+  await redisClient.connect().catch(console.error);
+
+  simulationInterval = setInterval(async () => {
+    if (!isRunning) return;
+
     try {
       const result = await pool.query("SELECT * FROM robots");
       const robots = result.rows;
@@ -16,6 +29,12 @@ const startSimulation = (io) => {
           [newLat, newLon, newStatus, robot.id]
         );
 
+        // save robot position
+        await pool.query(
+          "INSERT INTO robot_positions (robot_id, lat, lon) VALUES ($1, $2, $3)",
+          [robot.id, newLat, newLon]
+        );
+
         io.emit("robotUpdate", {
           id: robot.id,
           lat: newLat,
@@ -23,10 +42,22 @@ const startSimulation = (io) => {
           status: newStatus,
         });
       }
+
+      await redisClient.del("robots_list");
     } catch (error) {
       console.error("Simulation error:", error);
     }
   }, 2000);
+
+  // Автостарт
+  isRunning = true;
+  console.log("Simulation started");
 };
 
-module.exports = { startSimulation };
+const toggleSimulation = () => {
+  isRunning = !isRunning;
+  console.log(isRunning ? "▶Simulation resumed" : "Simulation paused");
+  return isRunning;
+};
+
+module.exports = { startSimulation, toggleSimulation };

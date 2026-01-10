@@ -7,7 +7,7 @@ require("dotenv").config();
 const { initDB } = require("./config/db");
 const authRoutes = require("./routes/auth");
 const robotsRoutes = require("./routes/robots");
-const { startSimulation } = require("./simulation");
+const { startSimulation, toggleSimulation } = require("./simulation");
 
 const app = express();
 const server = http.createServer(app);
@@ -31,6 +31,12 @@ app.use(express.json());
 
 app.use("/auth", authRoutes);
 app.use("/robots", robotsRoutes);
+
+// POST /simulation/toggle
+app.post("/simulation/toggle", (req, res) => {
+  const isRunning = toggleSimulation();
+  res.json({ running: isRunning });
+});
 
 io.on("connection", (socket) => {
   console.log("Client connected:", socket.id);

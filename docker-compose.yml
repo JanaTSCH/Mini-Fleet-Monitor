@@ -3,8 +3,8 @@ services:
     image: postgres:15
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: fleet
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: fleetmonitor
     ports:
       - "5432:5432"
     volumes:
@@ -16,34 +16,32 @@ services:
       retries: 5
 
   redis:
-    image: redis:7-alpine
+    image: redis:7
     ports:
       - "6379:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
-      timeout: 3s
+      timeout: 5s
       retries: 5
 
   api:
     build: ./backend
     ports:
-      - "3001:3000"
+      - "3002:3002"
     environment:
-      DB_HOST: db
-      DB_PORT: 5432
-      DB_USER: postgres
-      DB_PASSWORD: password
-      DB_NAME: fleet
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      JWT_SECRET: your_super_secret_key
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/fleetmonitor
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=your-secret-key-change-in-production
+      - PORT=3002
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_healthy
-    restart: on-failure
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
 
 volumes:
   postgres_data:

@@ -28,16 +28,16 @@ function MapComponent({ robots }) {
 
         return new Style({
           image: new Circle({
-            radius: 8,
+            radius: 10,
             fill: new Fill({ color }),
-            stroke: new Stroke({ color: "white", width: 2 }),
+            stroke: new Stroke({ color: "white", width: 3 }),
           }),
           text: new Text({
             text: feature.get("name"),
-            offsetY: -15,
-            font: "12px sans-serif",
-            fill: new Fill({ color: "#000" }),
-            stroke: new Stroke({ color: "#fff", width: 2 }),
+            offsetY: -20,
+            font: "bold 13px sans-serif",
+            fill: new Fill({ color: "#333" }),
+            stroke: new Stroke({ color: "#fff", width: 3 }),
           }),
         });
       },
@@ -48,7 +48,7 @@ function MapComponent({ robots }) {
       layers: [new TileLayer({ source: new OSM() }), vectorLayer],
       view: new View({
         center: fromLonLat([11.0328, 50.9787]), // Erfurt
-        zoom: 13,
+        zoom: 14,
       }),
     });
 
@@ -63,14 +63,12 @@ function MapComponent({ robots }) {
     if (!vectorSourceRef.current) return;
 
     robots.forEach((robot) => {
-      const coords = fromLonLat([robot.lon, robot.lat]);
+      const coords = fromLonLat([parseFloat(robot.lon), parseFloat(robot.lat)]);
 
       if (featuresRef.current[robot.id]) {
-        // Update marker
         featuresRef.current[robot.id].getGeometry().setCoordinates(coords);
         featuresRef.current[robot.id].set("status", robot.status);
       } else {
-        // Create new marker
         const feature = new Feature({
           geometry: new Point(coords),
           name: robot.name,
@@ -83,7 +81,7 @@ function MapComponent({ robots }) {
     });
   }, [robots]);
 
-  return <div ref={mapRef} style={{ width: "100%", height: "600px" }} />;
+  return <div ref={mapRef} style={{ width: "100%", height: "100%" }} />;
 }
 
 export default MapComponent;

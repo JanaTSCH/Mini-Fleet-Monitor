@@ -19,13 +19,12 @@ router.post("/login", async (req, res) => {
     }
 
     const user = result.rows[0];
-    const isValid = await bcrypt.compare(password, user.password_hash);
+    const isValid = await bcrypt.compare(password, user.password);
 
     if (!isValid) {
       return res.status(401).json({ error: "Invalid email or password" });
     }
 
-    // Создать JWT токен
     const token = jwt.sign(
       { id: user.id, email: user.email },
       process.env.JWT_SECRET,

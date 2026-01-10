@@ -11,38 +11,42 @@ const { startSimulation } = require("./simulation");
 
 const app = express();
 const server = http.createServer(app);
+
 const io = socketIO(server, {
   cors: {
-    origin: "http://localhost:3001", // Frontend URL
+    origin: "http://localhost:3001",
     methods: ["GET", "POST"],
+    credentials: true,
   },
 });
 
-// Middleware
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:3001",
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 
-// Routes
 app.use("/auth", authRoutes);
 app.use("/robots", robotsRoutes);
 
-// WebSocket
 io.on("connection", (socket) => {
-  console.log("Client connected", socket.id);
+  console.log("Client connected:", socket.id);
 
   socket.on("disconnect", () => {
-    console.log("Client disconnected", socket.id);
+    console.log("Client disconnected:", socket.id);
   });
 });
 
-// Start the server
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3002;
 
 const startServer = async () => {
   await initDB();
 
   server.listen(PORT, () => {
-    console.log(`Server started on http://localhost:${PORT}`);
+    console.log(`Server running on http://localhost:${PORT}`);
     startSimulation(io);
   });
 };

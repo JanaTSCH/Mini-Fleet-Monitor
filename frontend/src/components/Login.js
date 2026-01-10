@@ -58,7 +58,7 @@ function Login({ onLogin }) {
         <button
           type="submit"
           disabled={loading}
-          style={{ width: "100%", padding: "10px" }}
+          style={{ width: "419px", padding: "10px" }}
         >
           {loading ? "Signing in..." : "Sign In"}
         </button>

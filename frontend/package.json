@@ -9,6 +9,7 @@
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.13.2",
     "cross-env": "^10.1.0",
+    "lucide-react": "^0.563.0",
     "ol": "^10.7.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",

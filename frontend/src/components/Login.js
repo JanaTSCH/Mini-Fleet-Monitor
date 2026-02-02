@@ -1,74 +1,118 @@
 import React, { useState } from "react";
 import axios from "axios";
+import SpotlightText from "./ui/SpotlightText";
 
 function Login({ onLogin }) {
-  const [email, setEmail] = useState("admin@test.com");
-  const [password, setPassword] = useState("test123");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [theme, setTheme] = useState("light");
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const roles = [
+    {
+      id: "admin",
+      label: "Admin",
+      desc: "Full Access",
+      email: "admin@test.com",
+      password: "test123",
+    },
+    {
+      id: "technician",
+      label: "Technician",
+      desc: "Full Control",
+      email: "technician@robot.com",
+      password: "test123",
+    },
+    {
+      id: "economist",
+      label: "Economist",
+      desc: "Analytics",
+      email: "economist@robot.com",
+      password: "test123",
+    },
+    {
+      id: "user",
+      label: "User",
+      desc: "View Only",
+      email: "user@robot.com",
+      password: "test123",
+    },
+  ];
+
+  const handleRoleClick = async (role) => {
     setError("");
     setLoading(true);
 
     try {
       const response = await axios.post("http://localhost:3002/auth/login", {
-        email,
-        password,
+        email: role.email,
+        password: role.password,
       });
 
       localStorage.setItem("token", response.data.token);
+      localStorage.setItem("role", response.data.role || role.id);
       onLogin(response.data.token);
     } catch (err) {
-      setError("Invalid email or password");
-    } finally {
+      setError(err.response?.data?.message || "Login failed. Check backend.");
       setLoading(false);
     }
   };
 
+  const toggleTheme = () => {
+    const newTheme = theme === "light" ? "dark" : "light";
+    setTheme(newTheme);
+    document.documentElement.setAttribute("data-theme", newTheme);
+  };
+
   return (
-    <div style={{ padding: "50px", maxWidth: "400px", margin: "0 auto" }}>
-      <form onSubmit={handleSubmit}>
-        <h2>Fleet Monitor</h2>
-        <p>Sign In</p>
+    <div className="login-page">
+      <div className="login-bg"></div>
 
-        <div style={{ marginBottom: "10px" }}>
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            style={{ width: "100%", padding: "8px" }}
-            required
-          />
-        </div>
-
-        <div style={{ marginBottom: "10px" }}>
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            style={{ width: "100%", padding: "8px" }}
-            required
-          />
-        </div>
-
+      <header className="login-header">
         <button
-          type="submit"
-          disabled={loading}
-          style={{ width: "419px", padding: "10px" }}
+          onClick={toggleTheme}
+          className="btn btn-md btn-ghost"
+          aria-label="Toggle theme"
         >
-          {loading ? "Signing in..." : "Sign In"}
+          {theme === "light" ? "🌙" : "☀️"}
         </button>
+      </header>
 
-        {error && <p style={{ color: "red" }}>{error}</p>}
+      <main className="login-content">
+        <div className="login-container">
+          <div className="login-brand">
+            <SpotlightText
+              className="login-brand-title"
+              glowColor="#DC2626" // Selectel red
+              baseColor="#99a3b3" // Gray
+            >
+              RoboFleet Sicherheit
+            </SpotlightText>
 
-        <p style={{ fontSize: "12px", color: "#666", marginTop: "15px" }}>
-          Test credentials: admin@test.com / test123
-        </p>
-      </form>
+            <p className="login-brand-subtitle">
+              Robot Fleet Monitoring System
+            </p>
+          </div>
+
+          {error && <div className="login-error">{error}</div>}
+
+          <div className="login-roles">
+            {roles.map((role) => (
+              <button
+                key={role.id}
+                onClick={() => handleRoleClick(role)}
+                disabled={loading}
+                className="role-card"
+              >
+                <div className="role-card-label">{role.label}</div>
+                <div className="role-card-desc">{role.desc}</div>
+                <div className="role-card-email">{role.email}</div>
+              </button>
+            ))}
+          </div>
+
+          <p className="login-hint">Click on any role to sign in</p>
+        </div>
+      </main>
     </div>
   );
 }

@@ -1,0 +1,32 @@
+.spotlight-text {
+  position: relative;
+  display: inline-block;
+  cursor: default;
+  user-select: none;
+  color: rgb(var(--text-tertiary));
+  transition: color 0.3s ease;
+}
+
+.spotlight-text::before {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(
+    circle at var(--spotlight-x, 50%) var(--spotlight-y, 50%),
+    rgb(var(--primary)) 0%,
+    transparent 60%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.spotlight-text:hover::before {
+  opacity: 1;
+}

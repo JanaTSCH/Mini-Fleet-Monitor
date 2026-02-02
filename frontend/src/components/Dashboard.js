@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import io from "socket.io-client";
 import MapComponent from "./Map";
+import ReportDownload from "./ReportDownload";
+import "./Dashboard.css";
 
 function Dashboard({ token, onLogout }) {
   const [robots, setRobots] = useState([]);

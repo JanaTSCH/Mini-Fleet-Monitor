@@ -1,60 +1,41 @@
-const express = require("express");
-const http = require("http");
-const socketIO = require("socket.io");
-const cors = require("cors");
-require("dotenv").config();
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import { createServer } from "http";
+import { Server } from "socket.io";
 
-const { initDB } = require("./config/db");
-const authRoutes = require("./routes/auth");
-const robotsRoutes = require("./routes/robots");
-const { startSimulation, toggleSimulation } = require("./simulation");
+import { initDB } from "./config/db.js";
+import { startSimulation } from "./routes/simulation.js";
+import authRoutes from "./routes/auth.js";
+import robotRoutes from "./routes/robots.js";
+import simulationRoutes from "./routes/simulation.js";
+
+dotenv.config();
 
 const app = express();
-const server = http.createServer(app);
-
-const io = socketIO(server, {
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
   cors: {
-    origin: "http://localhost:3001",
+    origin: process.env.CLIENT_URL || "http://localhost:3001",
     methods: ["GET", "POST"],
-    credentials: true,
   },
 });
 
-app.use(
-  cors({
-    origin: "http://localhost:3001",
-    credentials: true,
-  })
-);
-
+app.use(cors());
 app.use(express.json());
 
 app.use("/auth", authRoutes);
-app.use("/robots", robotsRoutes);
+app.use("/robots", robotRoutes);
+app.use("/simulation", simulationRoutes);
 
-// POST /simulation/toggle
-app.post("/simulation/toggle", (req, res) => {
-  const isRunning = toggleSimulation();
-  res.json({ running: isRunning });
+app.get("/health", (req, res) => {
+  res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
-io.on("connection", (socket) => {
-  console.log("Client connected:", socket.id);
-
-  socket.on("disconnect", () => {
-    console.log("Client disconnected:", socket.id);
-  });
-});
+await initDB();
+startSimulation(io);
 
 const PORT = process.env.PORT || 3002;
-
-const startServer = async () => {
-  await initDB();
-
-  server.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-    startSimulation(io);
-  });
-};
-
-startServer();
+httpServer.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});

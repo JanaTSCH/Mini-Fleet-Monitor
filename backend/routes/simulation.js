@@ -1,13 +1,21 @@
-const { pool } = require("./config/db");
-const redis = require("redis");
+import express from "express";
+import redis from "redis";
+
+import { pool } from "../config/db.js";
+import { authenticateToken } from "../middleware/auth.js";
+
+const router = express.Router();
 
 let redisClient;
 let simulationInterval;
 let isRunning = false;
+let io;
 
-const startSimulation = async (io) => {
+export const startSimulation = async (socketIO) => {
+  io = socketIO;
+
   redisClient = redis.createClient({
-    url: process.env.REDIS_URL,
+    url: process.env.REDIS_URL || "redis://localhost:6379",
   });
 
   await redisClient.connect().catch(console.error);
@@ -29,7 +37,6 @@ const startSimulation = async (io) => {
           [newLat, newLon, newStatus, robot.id]
         );
 
-        // save robot position
         await pool.query(
           "INSERT INTO robot_positions (robot_id, lat, lon) VALUES ($1, $2, $3)",
           [robot.id, newLat, newLon]
@@ -49,15 +56,22 @@ const startSimulation = async (io) => {
     }
   }, 2000);
 
-  // Автостарт
   isRunning = true;
-  console.log("Simulation started");
+  console.log("🤖 Simulation started");
 };
 
-const toggleSimulation = () => {
+export const toggleSimulation = () => {
   isRunning = !isRunning;
-  console.log(isRunning ? "▶Simulation resumed" : "Simulation paused");
+  console.log(isRunning ? "▶️  Simulation resumed" : "⏸️  Simulation paused");
   return isRunning;
 };
 
-module.exports = { startSimulation, toggleSimulation };
+router.post("/toggle", authenticateToken, (req, res) => {
+  const status = toggleSimulation();
+  res.json({
+    running: status,
+    message: status ? "Simulation started" : "Simulation paused",
+  });
+});
+
+export default router;

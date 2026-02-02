@@ -1,11 +1,11 @@
-const express = require("express");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const { pool } = require("../config/db");
+import express from "express";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+
+import { pool } from "../config/db.js";
 
 const router = express.Router();
 
-// POST /auth/login
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
@@ -26,16 +26,26 @@ router.post("/login", async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: user.id, email: user.email },
+      {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+      },
       process.env.JWT_SECRET,
       { expiresIn: "24h" }
     );
 
-    res.json({ token, email: user.email });
+    res.json({
+      token,
+      user: {
+        email: user.email,
+        role: user.role,
+      },
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Server error" });
   }
 });
 
-module.exports = router;
+export default router;

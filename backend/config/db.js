@@ -1,74 +1,19 @@
-const { Pool } = require("pg");
-require("dotenv").config();
+import pg from "pg";
+import dotenv from "dotenv";
 
-const pool = new Pool({
+dotenv.config();
+
+const { Pool } = pg;
+
+export const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
-const initDB = async () => {
+export const initDB = async () => {
   try {
-    // users table
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS users (
-        id SERIAL PRIMARY KEY,
-        email VARCHAR(255) UNIQUE NOT NULL,
-        password VARCHAR(255) NOT NULL,
-        role VARCHAR(50) NOT NULL,
-        created_at TIMESTAMP DEFAULT NOW()
-      )
-    `);
-
-    // robots table
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS robots (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(100) NOT NULL,
-        status VARCHAR(20) DEFAULT 'idle',
-        lat DECIMAL(10, 7) NOT NULL,
-        lon DECIMAL(10, 7) NOT NULL,
-        battery INT,
-        updated_at TIMESTAMP DEFAULT NOW()
-      )
-    `);
-
-    // robot_positions log
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS robot_positions (
-        id SERIAL PRIMARY KEY,
-        robot_id INT REFERENCES robots(id) ON DELETE CASCADE,
-        lat DECIMAL(10, 7) NOT NULL,
-        lon DECIMAL(10, 7) NOT NULL,
-        recorded_at TIMESTAMP DEFAULT NOW()
-      )
-    `);
-
-    // test user
-    const bcrypt = require("bcrypt");
-    const hashedPassword = await bcrypt.hash("test123", 10);
-
-    await pool.query(
-      `
-      INSERT INTO users (email, password, role)
-      VALUES ('admin@test.com', $1, 'admin')
-      ON CONFLICT (email) DO NOTHING
-    `,
-      [hashedPassword]
-    );
-
-    // 3 test robots (Erfurt coordinates)
-    await pool.query(`
-      INSERT INTO robots (name, status, lat, lon, battery)
-      VALUES 
-        ('Robot-A', 'idle', 50.9787, 11.0328, 85),
-        ('Robot-B', 'moving', 50.9800, 11.0340, 72),
-        ('Robot-C', 'idle', 50.9750, 11.0300, 91)
-      ON CONFLICT DO NOTHING
-    `);
-
-    console.log("DB initialized");
+    await pool.query("SELECT 1");
+    console.log("✅ DB connected");
   } catch (error) {
-    console.error("DB initialization error:", error);
+    console.error("❌ DB error:", error.message);
   }
 };
-
-module.exports = { pool, initDB };

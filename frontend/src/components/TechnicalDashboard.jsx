@@ -1,49 +1,46 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { Play, Plus, Download } from "lucide-react";
 import Map from "./Map";
 import "./TechnicalDashboard.css";
 
 function TechnicalDashboard({ robots, role, fetchRobots }) {
   const [selectedRobot, setSelectedRobot] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [simulationRunning, setSimulationRunning] = useState(true);
   const [newRobot, setNewRobot] = useState({
     name: "",
-    type: "warehouse",
-    latitude: 50.9,
-    longitude: 11.0,
+    lat: 50.9787,
+    lon: 11.0328,
   });
 
   const handleAddRobot = async (e) => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
-      await axios.post("http://localhost:3002/api/robots", newRobot, {
+      await axios.post("http://localhost:3002/robots", newRobot, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setNewRobot({
-        name: "",
-        type: "warehouse",
-        latitude: 50.9,
-        longitude: 11.0,
-      });
+      setNewRobot({ name: "", lat: 50.9787, lon: 11.0328 });
       setShowAddForm(false);
       fetchRobots();
     } catch (err) {
+      console.error("Failed to add robot:", err);
       alert("Failed to add robot");
     }
   };
 
-  const startSimulation = async () => {
+  const toggleSimulation = async () => {
     try {
       const token = localStorage.getItem("token");
-      await axios.post(
-        "http://localhost:3002/api/robots/simulate",
+      const response = await axios.post(
+        "http://localhost:3002/simulation/toggle",
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      alert("Simulation started");
+      setSimulationRunning(response.data.running);
     } catch (err) {
-      alert("Simulation failed");
+      console.error("Simulation failed:", err);
     }
   };
 
@@ -64,27 +61,38 @@ function TechnicalDashboard({ robots, role, fetchRobots }) {
     URL.revokeObjectURL(url);
   };
 
+  // Безопасное форматирование координат
+  const formatCoord = (value) => {
+    const num = parseFloat(value);
+    return isNaN(num) ? "N/A" : num.toFixed(4);
+  };
+
+  const formatCoordLong = (value) => {
+    const num = parseFloat(value);
+    return isNaN(num) ? "N/A" : num.toFixed(6);
+  };
+
   return (
     <div className="tech-dashboard">
       <div className="container">
         <div className="toolbar">
           <div className="toolbar-left">
-            <button onClick={startSimulation} className="btn-primary">
-              ▶ Simulate
+            <button onClick={toggleSimulation} className="btn-primary">
+              <Play size={16} />
+              {simulationRunning ? "Pause" : "Start"}
             </button>
             <button
               onClick={() => setShowAddForm(!showAddForm)}
               className="btn-secondary"
             >
-              + Add Robot
-            </button>
-            <button onClick={fetchRobots} className="btn-ghost">
-              🔄
+              <Plus size={16} />
+              {showAddForm ? "Cancel" : "Add Robot"}
             </button>
           </div>
           <div className="toolbar-right">
             <button onClick={downloadJSON} className="btn-ghost">
-              ⬇ JSON
+              <Download size={16} />
+              Export
             </button>
           </div>
         </div>
@@ -93,65 +101,42 @@ function TechnicalDashboard({ robots, role, fetchRobots }) {
           <form onSubmit={handleAddRobot} className="add-form">
             <input
               type="text"
-              placeholder="Name"
+              placeholder="Robot name"
               value={newRobot.name}
               onChange={(e) =>
                 setNewRobot({ ...newRobot, name: e.target.value })
               }
               required
             />
-            <select
-              value={newRobot.type}
-              onChange={(e) =>
-                setNewRobot({ ...newRobot, type: e.target.value })
-              }
-            >
-              <option value="warehouse">Warehouse</option>
-              <option value="delivery">Delivery</option>
-              <option value="cleaning">Cleaning</option>
-            </select>
             <input
               type="number"
-              step="0.01"
-              placeholder="Lat"
-              value={newRobot.latitude}
+              step="0.0001"
+              placeholder="Latitude"
+              value={newRobot.lat}
               onChange={(e) =>
-                setNewRobot({
-                  ...newRobot,
-                  latitude: parseFloat(e.target.value),
-                })
+                setNewRobot({ ...newRobot, lat: parseFloat(e.target.value) })
               }
               required
             />
             <input
               type="number"
-              step="0.01"
-              placeholder="Lng"
-              value={newRobot.longitude}
+              step="0.0001"
+              placeholder="Longitude"
+              value={newRobot.lon}
               onChange={(e) =>
-                setNewRobot({
-                  ...newRobot,
-                  longitude: parseFloat(e.target.value),
-                })
+                setNewRobot({ ...newRobot, lon: parseFloat(e.target.value) })
               }
               required
             />
             <button type="submit" className="btn-primary">
-              Create
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowAddForm(false)}
-              className="btn-ghost"
-            >
-              Cancel
+              Add
             </button>
           </form>
         )}
 
         <div className="tech-grid">
           <div className="panel map-panel">
-            <Map robots={robots} onRobotClick={setSelectedRobot} />
+            <Map robots={robots} />
           </div>
 
           <div className="panel table-panel">
@@ -162,9 +147,8 @@ function TechnicalDashboard({ robots, role, fetchRobots }) {
                   <tr>
                     <th>ID</th>
                     <th>Name</th>
-                    <th>Type</th>
                     <th>Status</th>
-                    <th>Battery</th>
+                    <th>Position</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -178,13 +162,14 @@ function TechnicalDashboard({ robots, role, fetchRobots }) {
                     >
                       <td className="mono">#{robot.id}</td>
                       <td className="bold">{robot.name}</td>
-                      <td>{robot.type}</td>
                       <td>
                         <span className={`badge ${robot.status}`}>
                           {robot.status}
                         </span>
                       </td>
-                      <td>{robot.battery}%</td>
+                      <td className="mono small">
+                        {formatCoord(robot.lat)}, {formatCoord(robot.lon)}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -195,42 +180,39 @@ function TechnicalDashboard({ robots, role, fetchRobots }) {
           {selectedRobot && (
             <div className="panel details-panel">
               <div className="details-header">
-                <h3>Details</h3>
+                <h3>Robot Details</h3>
                 <button
                   onClick={() => setSelectedRobot(null)}
                   className="btn-close"
                 >
-                  ✕
+                  ×
                 </button>
               </div>
               <div className="details">
                 <div className="detail">
-                  <span>ID:</span>
+                  <span>ID</span>
                   <span className="mono">#{selectedRobot.id}</span>
                 </div>
                 <div className="detail">
-                  <span>Name:</span>
+                  <span>Name</span>
                   <span className="bold">{selectedRobot.name}</span>
                 </div>
                 <div className="detail">
-                  <span>Type:</span>
-                  <span>{selectedRobot.type}</span>
-                </div>
-                <div className="detail">
-                  <span>Status:</span>
+                  <span>Status</span>
                   <span className={`badge ${selectedRobot.status}`}>
                     {selectedRobot.status}
                   </span>
                 </div>
                 <div className="detail">
-                  <span>Battery:</span>
-                  <span>{selectedRobot.battery}%</span>
+                  <span>Latitude</span>
+                  <span className="mono">
+                    {formatCoordLong(selectedRobot.lat)}
+                  </span>
                 </div>
                 <div className="detail">
-                  <span>Position:</span>
-                  <span className="mono small">
-                    {selectedRobot.latitude.toFixed(4)},{" "}
-                    {selectedRobot.longitude.toFixed(4)}
+                  <span>Longitude</span>
+                  <span className="mono">
+                    {formatCoordLong(selectedRobot.lon)}
                   </span>
                 </div>
               </div>

@@ -99,8 +99,8 @@ LOGIN PAGE
 
 .role-card:hover:not(:disabled) {
   border-color: rgb(var(--primary));
-  /* background: rgba(var(--primary), 0.02); */
-  transform: translateY(-1px);
+  background: rgba(var(--primary), 0.2);
+  /* transform: translateY(-1px); */
   box-shadow: var(--shadow-lg);
 }
 

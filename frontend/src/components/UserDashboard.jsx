@@ -1,13 +1,14 @@
 import React from "react";
+import { Download } from "lucide-react";
 import Map from "./Map";
 import "./UserDashboard.css";
 
 function UserDashboard({ robots, fetchRobots }) {
   const stats = {
     total: robots.length,
-    active: robots.filter((r) => r.status === "active").length,
+    active: robots.filter((r) => r.status === "moving").length,
     idle: robots.filter((r) => r.status === "idle").length,
-    lowBattery: robots.filter((r) => r.battery < 20).length,
+    online: robots.filter((r) => r.status !== "offline").length,
   };
 
   const downloadJSON = () => {
@@ -22,22 +23,26 @@ function UserDashboard({ robots, fetchRobots }) {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `robofleet-${Date.now()}.json`;
+    link.download = `robofleet-user-${Date.now()}.json`;
     link.click();
     URL.revokeObjectURL(url);
+  };
+
+  // Безопасное форматирование координат
+  const formatCoord = (value) => {
+    const num = parseFloat(value);
+    return isNaN(num) ? "N/A" : num.toFixed(4);
   };
 
   return (
     <div className="user-dashboard">
       <div className="container">
         <div className="top-bar">
-          <h1>Fleet Overview</h1>
+          <h1>Fleet Dashboard</h1>
           <div className="top-actions">
-            <button onClick={fetchRobots} className="btn-ghost">
-              🔄 Refresh
-            </button>
-            <button onClick={downloadJSON} className="btn-secondary">
-              ⬇ Export JSON
+            <button onClick={downloadJSON} className="btn-ghost">
+              <Download size={16} />
+              Export
             </button>
           </div>
         </div>
@@ -56,8 +61,8 @@ function UserDashboard({ robots, fetchRobots }) {
             <div className="stat-label">Idle</div>
           </div>
           <div className="stat-card">
-            <div className="stat-value warning">{stats.lowBattery}</div>
-            <div className="stat-label">Low Battery</div>
+            <div className="stat-value success">{stats.online}</div>
+            <div className="stat-label">Online</div>
           </div>
         </div>
 
@@ -65,10 +70,10 @@ function UserDashboard({ robots, fetchRobots }) {
           <div className="panel">
             <h2>Instructions</h2>
             <ul className="instructions">
-              <li>🟢 Green = Active robots</li>
-              <li>⚪ Gray = Idle robots</li>
-              <li>🟡 Yellow = Charging</li>
-              <li>🔴 Red battery = Need charging</li>
+              <li>✓ View real-time robot positions on the map</li>
+              <li>✓ Monitor fleet status and activity</li>
+              <li>✓ Track robot movements and updates</li>
+              <li>✓ Export data for analysis</li>
             </ul>
           </div>
 
@@ -84,8 +89,10 @@ function UserDashboard({ robots, fetchRobots }) {
                     </span>
                   </div>
                   <div className="robot-info">
-                    <span>Type: {robot.type}</span>
-                    <span>Battery: {robot.battery}%</span>
+                    <span className="mono">#{robot.id}</span>
+                    <span className="mono small">
+                      {formatCoord(robot.lat)}, {formatCoord(robot.lon)}
+                    </span>
                   </div>
                 </div>
               ))}
@@ -93,8 +100,7 @@ function UserDashboard({ robots, fetchRobots }) {
           </div>
 
           <div className="panel map-panel">
-            <h2>Map</h2>
-            <Map robots={robots} onRobotClick={() => {}} />
+            <Map robots={robots} />
           </div>
         </div>
       </div>

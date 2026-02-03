@@ -17,7 +17,13 @@ function MapComponent({ robots }) {
   const vectorSourceRef = useRef(null);
   const featuresRef = useRef({});
 
+  // Инициализация карты
   useEffect(() => {
+    if (!mapRef.current) {
+      console.error("❌ mapRef.current is null!");
+      return;
+    }
+
     vectorSourceRef.current = new VectorSource();
 
     const vectorLayer = new VectorLayer({
@@ -52,6 +58,8 @@ function MapComponent({ robots }) {
       }),
     });
 
+    console.log("✅ Map initialized");
+
     return () => {
       if (mapInstanceRef.current) {
         mapInstanceRef.current.setTarget(null);
@@ -59,29 +67,73 @@ function MapComponent({ robots }) {
     };
   }, []);
 
+  // Обновление роботов
   useEffect(() => {
-    if (!vectorSourceRef.current) return;
+    if (!vectorSourceRef.current) {
+      console.warn("⚠️ Vector source not ready");
+      return;
+    }
+
+    if (!robots || robots.length === 0) {
+      console.warn("⚠️ No robots data");
+      return;
+    }
+
+    console.log(`🤖 Updating ${robots.length} robots`);
 
     robots.forEach((robot) => {
-      const coords = fromLonLat([parseFloat(robot.lon), parseFloat(robot.lat)]);
+      const lon = parseFloat(robot.lon);
+      const lat = parseFloat(robot.lat);
 
-      if (featuresRef.current[robot.id]) {
-        featuresRef.current[robot.id].getGeometry().setCoordinates(coords);
-        featuresRef.current[robot.id].set("status", robot.status);
+      if (isNaN(lon) || isNaN(lat)) {
+        console.error(`❌ Invalid coordinates for robot ${robot.id}`);
+        return;
+      }
+
+      const coords = fromLonLat([lon, lat]);
+
+      // ПРОВЕРЯЕМ: есть ли фича В РЕАЛЬНОСТИ на карте
+      const existingFeature = featuresRef.current[robot.id];
+      const isOnMap =
+        existingFeature && vectorSourceRef.current.hasFeature(existingFeature);
+
+      if (isOnMap) {
+        // Робот УЖЕ на карте - обновляем координаты
+        existingFeature.getGeometry().setCoordinates(coords);
+        existingFeature.set("status", robot.status);
+        console.log(
+          `♻️ Updated robot ${robot.id} at [${lat.toFixed(4)}, ${lon.toFixed(
+            4
+          )}]`
+        );
       } else {
+        // Робота НЕТ на карте - создаём и добавляем
         const feature = new Feature({
           geometry: new Point(coords),
           name: robot.name,
           status: robot.status,
         });
-
         featuresRef.current[robot.id] = feature;
         vectorSourceRef.current.addFeature(feature);
+        console.log(
+          `➕ Added robot ${robot.id} at [${lat.toFixed(4)}, ${lon.toFixed(4)}]`
+        );
       }
     });
+
+    const featureCount = vectorSourceRef.current.getFeatures().length;
+    console.log(`✅ Total features on map: ${featureCount}`);
   }, [robots]);
 
-  return <div ref={mapRef} style={{ width: "100%", height: "100%" }} />;
+  return (
+    <div
+      ref={mapRef}
+      style={{
+        width: "100%",
+        height: "100%",
+      }}
+    />
+  );
 }
 
 export default MapComponent;

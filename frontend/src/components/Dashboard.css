@@ -266,3 +266,33 @@ button {
 [data-view-mode="mobile"] .map-panel {
   min-height: 300px !important;
 }
+
+/* Loading */
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 68px);
+  gap: 1rem;
+  color: rgb(82, 82, 82);
+}
+
+[data-theme="dark"] .loading {
+  color: rgb(163, 163, 163);
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(220, 38, 38, 0.2);
+  border-top-color: rgb(220, 38, 38);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

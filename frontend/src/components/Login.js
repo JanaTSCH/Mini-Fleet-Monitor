@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { Sun, Moon } from "lucide-react";
 import SpotlightText from "./ui/SpotlightText";
 
 function Login({ onLogin }) {
@@ -49,7 +50,7 @@ function Login({ onLogin }) {
       });
 
       localStorage.setItem("token", response.data.token);
-      localStorage.setItem("role", response.data.role || role.id);
+      localStorage.setItem("role", response.data.user.role || role.id);
       onLogin(response.data.token);
     } catch (err) {
       setError(err.response?.data?.message || "Login failed. Check backend.");
@@ -73,7 +74,7 @@ function Login({ onLogin }) {
           className="btn btn-md btn-ghost"
           aria-label="Toggle theme"
         >
-          {theme === "light" ? "🌙" : "☀️"}
+          {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
         </button>
       </header>
 

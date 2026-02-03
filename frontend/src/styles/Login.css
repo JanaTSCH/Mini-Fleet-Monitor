@@ -20,10 +20,10 @@ LOGIN PAGE
     radial-gradient(circle at 25% 25%, transparent 100%),
     radial-gradient(
       circle,
-      rgba(var(--text-tertiary), 0.5) 0.2px,
+      rgba(var(--text-tertiary), 0.7) 0.8px,
       transparent 1px
     );
-  background-size: 600px 600px, 800px 800px, 20px 20px;
+  background-size: 600px 600px, 800px 800px, 24px 24px;
   background-position: 0% 0%, 100% 100%, 0 0;
 }
 
@@ -85,7 +85,7 @@ LOGIN PAGE
 .role-card {
   padding: var(--space-5);
   background: rgb(var(--surface));
-  border: 1.5px solid rgb(var(--border));
+  border: 2px solid rgb(var(--border));
   border-radius: var(--radius-lg);
 
   cursor: pointer;
@@ -99,7 +99,7 @@ LOGIN PAGE
 
 .role-card:hover:not(:disabled) {
   border-color: rgb(var(--primary));
-  background: rgba(var(--primary), 0.02);
+  /* background: rgba(var(--primary), 0.02); */
   transform: translateY(-1px);
   box-shadow: var(--shadow-lg);
 }

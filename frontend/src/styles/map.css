@@ -1,0 +1,384 @@
+/* Container */
+.map-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #ddd;
+  font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* Легкий оверлей для мягкости */
+.map-container::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.02);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* 
+     ZOOM CONTROL (LEAFLET-STYLE)
+ */
+
+.ol-zoom {
+  top: 10px !important;
+  left: 10px !important;
+  right: auto !important;
+  bottom: auto !important;
+
+  /* Leaflet bar style */
+  background: transparent !important;
+  padding: 0 !important;
+  border-radius: 4px !important;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.65) !important;
+  overflow: hidden;
+}
+
+.ol-zoom button {
+  background-color: #fff !important;
+  color: #000 !important;
+  border: none !important;
+  border-bottom: 1px solid #ccc !important;
+
+  width: 26px !important;
+  height: 26px !important;
+  line-height: 26px !important;
+
+  font-size: 18px !important;
+  font-weight: bold !important;
+  font-family: "Lucida Console", Monaco, monospace !important;
+
+  display: block !important;
+  text-align: center !important;
+  padding: 0 !important;
+  margin: 0 !important;
+
+  border-radius: 0 !important;
+  cursor: pointer;
+  transition: background-color 0.1s ease;
+}
+
+.ol-zoom button:hover {
+  background-color: #f4f4f4 !important;
+}
+
+.ol-zoom button:first-child {
+  border-top-left-radius: 4px !important;
+  border-top-right-radius: 4px !important;
+}
+
+.ol-zoom button:last-child {
+  border-bottom-left-radius: 4px !important;
+  border-bottom-right-radius: 4px !important;
+  border-bottom: none !important;
+}
+
+.ol-zoom button:focus {
+  outline: none !important;
+}
+
+/* Touch devices */
+@media (hover: none) and (pointer: coarse) {
+  .ol-zoom button {
+    width: 30px !important;
+    height: 30px !important;
+    line-height: 30px !important;
+    font-size: 22px !important;
+  }
+
+  .ol-zoom button:first-child {
+    border-top-left-radius: 2px !important;
+    border-top-right-radius: 2px !important;
+  }
+
+  .ol-zoom button:last-child {
+    border-bottom-left-radius: 2px !important;
+    border-bottom-right-radius: 2px !important;
+  }
+}
+
+/* 
+     ATTRIBUTION CONTROL (LEAFLET-STYLE)
+ */
+
+.ol-attribution {
+  bottom: 0 !important;
+  right: 0 !important;
+  left: auto !important;
+  top: auto !important;
+
+  background: #fff !important;
+  background: rgba(255, 255, 255, 0.7) !important;
+
+  font-size: 11px !important;
+  padding: 0 5px !important;
+  margin: 0 !important;
+
+  color: #333 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.ol-attribution ul {
+  margin: 0 !important;
+  padding: 0 !important;
+  color: #333 !important;
+  list-style: none;
+  font-size: 11px !important;
+}
+
+.ol-attribution button,
+.ol-attribution li {
+  color: #333 !important;
+  background: transparent !important;
+}
+
+.ol-attribution a {
+  color: #0078a8 !important;
+  text-decoration: none;
+}
+
+.ol-attribution a:hover {
+  text-decoration: underline;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+     OTHER CONTROLS (GENERAL LEAFLET BAR STYLE)
+     ═══════════════════════════════════════════════════════════════════════ */
+
+.ol-control {
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+.ol-control button {
+  background-color: #fff !important;
+  color: black !important;
+  border-radius: 4px !important;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4) !important;
+  transition: background-color 0.1s ease;
+}
+
+.ol-control button:hover {
+  background-color: #f4f4f4 !important;
+}
+
+.ol-layer canvas {
+  filter: grayscale(10%) brightness(0.7) contrast(2.5);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+     POPUP / OVERLAY (LEAFLET-STYLE)
+     ═══════════════════════════════════════════════════════════════════════ */
+
+.ol-overlay-container {
+  position: absolute;
+  text-align: center;
+  pointer-events: none;
+}
+
+.ol-popup {
+  background: white;
+  color: #333;
+  box-shadow: 0 3px 14px rgba(0, 0, 0, 0.4);
+  border-radius: 12px;
+  padding: 1px;
+  min-width: 150px;
+  pointer-events: auto;
+}
+
+.ol-popup-content {
+  padding: 13px 19px;
+  line-height: 1.4;
+}
+
+.ol-popup-closer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 4px 4px 0 0;
+  border: none;
+  text-align: center;
+  width: 18px;
+  height: 14px;
+  font: 16px/14px Tahoma, Verdana, sans-serif;
+  color: #c3c3c3;
+  text-decoration: none;
+  font-weight: bold;
+  background: transparent;
+  cursor: pointer;
+}
+
+.ol-popup-closer:hover {
+  color: #999;
+}
+
+/* 
+     CURSORS  */
+
+.ol-viewport {
+  cursor: grab;
+  cursor: -webkit-grab;
+  cursor: -moz-grab;
+}
+
+.ol-viewport.ol-viewport-dragging {
+  cursor: move;
+  cursor: -webkit-grabbing;
+  cursor: -moz-grabbing;
+  cursor: grabbing;
+}
+
+.ol-selectable {
+  cursor: pointer;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+     ANIMATIONS (LEAFLET-STYLE)
+     ═══════════════════════════════════════════════════════════════════════ */
+
+.ol-layer {
+  transition: opacity 0.1s linear;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+     ZOOM BOX (LEAFLET-STYLE)
+     ═══════════════════════════════════════════════════════════════════════ */
+
+.ol-box {
+  border: 2px dotted #38f;
+  background: rgba(255, 255, 255, 0.5);
+  box-sizing: border-box;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   DARK THEME ADAPTATION
+   ═══════════════════════════════════════════════════════════════════════ */
+
+[data-theme="dark"] .map-container {
+  background: #1a1a1a;
+}
+
+[data-theme="dark"] .map-container::after {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+[data-theme="dark"] .ol-layer canvas {
+  filter: grayscale(10%) brightness(0.65) contrast(3);
+
+  transition: filter 0.3s ease;
+}
+
+/* Dark zoom buttons */
+[data-theme="dark"] .ol-zoom {
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.9) !important;
+}
+
+[data-theme="dark"] .ol-zoom button {
+  background-color: rgba(38, 38, 38, 0.95) !important;
+  color: #e5e5e5 !important;
+  border-bottom-color: rgba(64, 64, 64, 0.7) !important;
+}
+
+[data-theme="dark"] .ol-zoom button:hover {
+  background-color: rgba(64, 64, 64, 0.9) !important;
+}
+
+/* Dark attribution */
+[data-theme="dark"] .ol-attribution {
+  background: rgba(26, 26, 26, 0.85) !important;
+  color: #a3a3a3 !important;
+}
+
+[data-theme="dark"] .ol-attribution ul,
+[data-theme="dark"] .ol-attribution button,
+[data-theme="dark"] .ol-attribution li {
+  color: #a3a3a3 !important;
+}
+
+[data-theme="dark"] .ol-attribution a {
+  color: #60a5fa !important;
+}
+
+/* Dark popup */
+[data-theme="dark"] .ol-popup {
+  background: rgba(38, 38, 38, 0.98);
+  color: #e5e5e5;
+  box-shadow: 0 3px 14px rgba(0, 0, 0, 0.8);
+}
+
+[data-theme="dark"] .ol-popup-closer {
+  color: #737373;
+}
+
+[data-theme="dark"] .ol-popup-closer:hover {
+  color: #d4d4d4;
+}
+
+/* Dark other controls */
+[data-theme="dark"] .ol-control button {
+  background-color: rgba(38, 38, 38, 0.95) !important;
+  color: #e5e5e5 !important;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.8) !important;
+}
+
+[data-theme="dark"] .ol-control button:hover {
+  background-color: rgba(64, 64, 64, 0.9) !important;
+}
+
+/* Dark zoom box */
+[data-theme="dark"] .ol-box {
+  border-color: #60a5fa;
+  background: rgba(96, 165, 250, 0.2);
+}
+
+/* 
+     RESPONSIVE
+ */
+
+@media (max-width: 640px) {
+  .map-container {
+    border-radius: 8px;
+  }
+
+  .ol-zoom {
+    top: 8px !important;
+    left: 8px !important;
+  }
+}
+
+/* 
+     UTILITIES
+ */
+
+.ol-viewport,
+.ol-control,
+.ol-control button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.map-container,
+.ol-viewport {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Accessibility */
+.ol-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}

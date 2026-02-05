@@ -1,6 +1,6 @@
 import React from "react";
 import Marquee from "./Marquee";
-import "./Footer.css";
+import "../styles/footer.css";
 
 function Footer() {
   return (

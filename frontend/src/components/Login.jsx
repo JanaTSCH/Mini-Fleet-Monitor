@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { Sun, Moon } from "lucide-react";
 import SpotlightText from "./ui/SpotlightText";
+import "../styles/login.css";
 
 function Login({ onLogin }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [theme, setTheme] = useState("light");
 
   const roles = [
     {
@@ -58,38 +57,22 @@ function Login({ onLogin }) {
     }
   };
 
-  const toggleTheme = () => {
-    const newTheme = theme === "light" ? "dark" : "light";
-    setTheme(newTheme);
-    document.documentElement.setAttribute("data-theme", newTheme);
-  };
-
   return (
     <div className="login-page">
       <div className="login-bg"></div>
-
-      <header className="login-header">
-        <button
-          onClick={toggleTheme}
-          className="btn btn-md btn-ghost"
-          aria-label="Toggle theme"
-        >
-          {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
-        </button>
-      </header>
 
       <main className="login-content">
         <div className="login-container">
           <div className="login-brand">
             <SpotlightText
               className="login-brand-title"
-              glowColor="#DC2626" // Selectel red
-              baseColor="#99a3b3" // Gray
+              glowColor="#DC2626"
+              baseColor="#bac1c5"
             >
               RoboFleet Sicherheit
             </SpotlightText>
 
-            <p className="login-brand-subtitle">Monitoring System</p>
+            <div className="login-brand-subtitle">Monitoring System</div>
           </div>
 
           {error && <div className="login-error">{error}</div>}

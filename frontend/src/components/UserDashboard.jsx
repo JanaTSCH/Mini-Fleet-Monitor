@@ -1,7 +1,7 @@
 import React from "react";
 import { Download } from "lucide-react";
 import Map from "./Map";
-import "./UserDashboard.css";
+import "../styles/userDashboard.css";
 
 function UserDashboard({ robots, fetchRobots }) {
   const stats = {

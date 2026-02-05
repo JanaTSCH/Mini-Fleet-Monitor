@@ -1,0 +1,177 @@
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  animation: fadeIn 0.2s ease-out;
+  padding: var(--space-4);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-content {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: rgb(var(--surface));
+  border: 1px solid rgba(var(--border), 0.3);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-close {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  color: rgb(var(--text-tertiary));
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.modal-close:hover {
+  background: rgba(var(--bg-tertiary), 0.5);
+  color: rgb(var(--text-primary));
+}
+
+/* Header */
+.modal-header {
+  text-align: center;
+  margin-bottom: var(--space-6);
+}
+
+.modal-title {
+  font-size: var(--text-3xl);
+  font-weight: var(--font-bold);
+  color: rgb(var(--text-primary));
+  margin: 0 0 var(--space-2);
+}
+
+.modal-subtitle {
+  font-size: var(--text-base);
+  color: rgb(var(--text-secondary));
+  margin: 0;
+}
+
+/* Alert */
+.alert {
+  padding: var(--space-4);
+  margin-bottom: var(--space-6);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+}
+
+.alert-error {
+  background: rgba(var(--color-error), 0.1);
+  border: 1px solid rgba(var(--color-error), 0.3);
+  color: rgb(var(--color-error));
+}
+
+/* Role Grid */
+.role-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.role-card {
+  padding: var(--space-5);
+  background: rgba(var(--bg-secondary), 0.5);
+  border: 2px solid transparent;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  text-align: left;
+}
+
+.role-card:hover:not(:disabled) {
+  border-color: rgb(var(--primary));
+  background: rgba(var(--primary), 0.05);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.role-card:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.role-card-label {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: rgb(var(--text-primary));
+}
+
+.role-card-desc {
+  font-size: var(--text-sm);
+  color: rgb(var(--text-secondary));
+}
+
+.role-card-email {
+  font-size: var(--text-xs);
+  font-family: var(--font-mono);
+  color: rgb(var(--text-tertiary));
+  margin-top: var(--space-1);
+  padding-top: var(--space-2);
+  border-top: 1px solid rgba(var(--border), 0.3);
+}
+
+/* Hint */
+.modal-hint {
+  text-align: center;
+  font-size: var(--text-sm);
+  color: rgb(var(--text-tertiary));
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .modal-content {
+    padding: var(--space-6);
+  }
+
+  .role-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-title {
+    font-size: var(--text-2xl);
+  }
+}

@@ -17,6 +17,9 @@
   --color-primary-800: 153, 27, 27;
   --color-primary-900: 127, 29, 29;
 
+  --color-accent-1: (136, 172, 218);
+  --color-accent-2: (144, 168, 201);
+
   /* ⭐ Deep Blue - Secondary accent (server/tech vibe) */
   --color-blue-50: 239, 246, 255;
   --color-blue-100: 219, 234, 254;
@@ -79,6 +82,7 @@
   --text-primary: var(--color-gray-900);
   --text-secondary: var(--color-gray-600);
   --text-tertiary: var(--color-gray-400);
+  --text-accent: var(--color-accent-2);
   --border: var(--color-gray-200);
   --border-hover: var(--color-gray-300);
 

@@ -3,6 +3,7 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
 }
 
 .app-bg {
@@ -17,11 +18,8 @@
       transparent 1px
     );
   background-size: 24px 24px;
+  background-position: 0% 0%, 100% 100%, 0 0;
   pointer-events: none;
-}
-
-[data-theme="dark"] {
-  background: rgb(23, 23, 23);
 }
 
 [data-theme="dark"] .app-bg {
@@ -29,13 +27,16 @@
     radial-gradient(circle at 25% 25%, transparent 100%),
     radial-gradient(
       circle,
-      rgba(var(--text-tertiary), 0.7) 0.8px,
+      rgba(var(--text-tertiary), 0.5) 0.8px,
       transparent 1px
     );
-  background-size: 24px 24px;
 }
 
 .app > *:not(.app-bg) {
   position: relative;
   z-index: 1;
+}
+
+.app > header {
+  z-index: 100 !important;
 }

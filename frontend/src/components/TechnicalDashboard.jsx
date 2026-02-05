@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Play, Plus, Download, History, Clock } from "lucide-react";
 import Map from "./Map";
-import "./TechnicalDashboard.css";
+import "../styles/technicalDashboard.css";
 
 function TechnicalDashboard({ robots, role, fetchRobots }) {
   const [selectedRobot, setSelectedRobot] = useState(null);

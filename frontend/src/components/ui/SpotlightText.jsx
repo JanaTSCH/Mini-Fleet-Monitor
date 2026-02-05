@@ -3,8 +3,8 @@ import React, { useRef, useState } from "react";
 export default function SpotlightText({
   children,
   className = "",
-  glowColor = "#DC2626", // Красный Selectel
-  baseColor = "#99a3b3", // Серый
+  glowColor = "#DC2626",
+  baseColor = "#99a3b3",
 }) {
   const textRef = useRef(null);
   const [position, setPosition] = useState({ x: 50, y: 50 });

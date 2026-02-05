@@ -59,6 +59,7 @@
 .map-panel {
   grid-row: span 2;
   min-height: 600px;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .table-panel h3 {

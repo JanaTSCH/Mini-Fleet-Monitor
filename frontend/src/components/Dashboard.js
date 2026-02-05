@@ -3,7 +3,7 @@ import axios from "axios";
 import io from "socket.io-client";
 import UserDashboard from "./UserDashboard";
 import TechnicalDashboard from "./TechnicalDashboard";
-import "./Dashboard.css";
+import "../styles/dashboard.css";
 
 function Dashboard({ token, onLogout }) {
   const [robots, setRobots] = useState([]);

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Map from "./Map";
 import ReportDownload from "./ReportDownload";
-import "./Dashboard.css";
+import "../styles/dashboard.css";
 
 function Dashboard({ onLogout }) {
   const [robots, setRobots] = useState([]);

@@ -1,0 +1,85 @@
+.marquee-container {
+  width: 100%;
+  overflow: hidden;
+  background: rgb(var(--bg-tertiary));
+  border-bottom: 1px solid rgb(var(--border));
+  padding: var(--space-4) 0;
+  position: relative;
+  transition: background var(--transition-base);
+}
+
+.marquee-content {
+  display: flex;
+  gap: var(--space-8);
+  animation: marqueeScroll 30s linear infinite;
+  will-change: transform;
+}
+
+/* Минимальная анимация для battery saving */
+@media (prefers-reduced-motion: reduce) {
+  .marquee-content {
+    animation: marqueeScrollSlow 60s linear infinite;
+  }
+}
+
+.marquee-item {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: rgb(var(--text-tertiary));
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  white-space: nowrap;
+  transition: all var(--transition-base);
+}
+
+/* ⭐ Синий ТОЛЬКО при hover (акцент!) */
+.marquee-item:hover {
+  color: rgb(var(--secondary));
+  transform: scale(1.05);
+}
+
+/* Marquee scroll */
+@keyframes marqueeScroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-33.333%);
+  }
+}
+
+@keyframes marqueeScrollSlow {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-33.333%);
+  }
+}
+
+/* Gradient fade on edges */
+.marquee-container::before,
+.marquee-container::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 80px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.marquee-container::before {
+  left: 0;
+  background: linear-gradient(to right, rgb(var(--bg-tertiary)), transparent);
+}
+
+.marquee-container::after {
+  right: 0;
+  background: linear-gradient(to left, rgb(var(--bg-tertiary)), transparent);
+}
+
+/* Dark theme */
+[data-theme="dark"] .marquee-container {
+  background: rgb(var(--bg-tertiary));
+}

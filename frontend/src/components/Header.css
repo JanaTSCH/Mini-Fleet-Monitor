@@ -1,92 +1,29 @@
-.header {
-  position: sticky;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-
-  /* Glassmorphism */
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-
-  border-bottom: 1px solid rgba(229, 229, 229, 0.3);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+.header-title {
+  font-size: var(--text-xl);
+  font-weight: var(--font-semibold);
+  color: rgb(var(--text-primary));
+  margin: 0;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* Dark theme */
 [data-theme="dark"] .header {
-  background: rgba(23, 23, 23, 0.8);
-  border-bottom-color: rgba(64, 64, 64, 0.3);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  background: rgba(var(--color-gray-800), 0.7);
+  border-bottom-color: rgba(var(--border), 0.2);
 }
 
-.header-content {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 1rem 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.header-brand {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.brand-name {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: rgb(220, 38, 38);
-  font-family: "Bai Jamjuree", sans-serif;
-}
-
-[data-theme="dark"] .brand-name {
-  color: rgb(239, 68, 68);
-}
-
-.header-controls {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.header-btn {
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: 1px solid rgba(229, 229, 229, 0.5);
-  border-radius: 0.5rem;
-  cursor: pointer;
-  color: rgb(82, 82, 82);
-  transition: all 150ms ease;
-}
-
-[data-theme="dark"] .header-btn {
-  border-color: rgba(64, 64, 64, 0.5);
-  color: rgb(212, 212, 212);
-}
-
-.header-btn:hover {
-  background: rgba(229, 229, 229, 0.2);
-  border-color: rgba(229, 229, 229, 0.8);
-}
-
-[data-theme="dark"] .header-btn:hover {
-  background: rgba(64, 64, 64, 0.3);
-  border-color: rgba(64, 64, 64, 0.8);
-}
-
+/* Responsive */
 @media (max-width: 640px) {
-  .brand-name {
-    font-size: 1rem;
+  .header-content {
+    padding: var(--space-3) var(--space-4);
   }
 
-  .header-btn {
-    width: 32px;
-    height: 32px;
+  .header-title {
+    font-size: var(--text-lg);
   }
 }

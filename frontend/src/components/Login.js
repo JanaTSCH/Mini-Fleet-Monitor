@@ -89,9 +89,7 @@ function Login({ onLogin }) {
               RoboFleet Sicherheit
             </SpotlightText>
 
-            <p className="login-brand-subtitle">
-              Robot Fleet Monitoring System
-            </p>
+            <p className="login-brand-subtitle">Monitoring System</p>
           </div>
 
           {error && <div className="login-error">{error}</div>}

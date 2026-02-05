@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Play, Plus, Download } from "lucide-react";
+import { Play, Plus, Download, History, Clock } from "lucide-react";
 import Map from "./Map";
 import "./TechnicalDashboard.css";
 
@@ -8,11 +8,35 @@ function TechnicalDashboard({ robots, role, fetchRobots }) {
   const [selectedRobot, setSelectedRobot] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [simulationRunning, setSimulationRunning] = useState(true);
+  const [history, setHistory] = useState([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
+  const [cacheStatus, setCacheStatus] = useState(null);
+  const [cacheTTL, setCacheTTL] = useState(null);
+  const [countdown, setCountdown] = useState(null);
   const [newRobot, setNewRobot] = useState({
     name: "",
     lat: 50.9787,
     lon: 11.0328,
   });
+
+  // Таймер обратного отсчёта TTL
+  useEffect(() => {
+    if (cacheTTL && cacheStatus === "HIT") {
+      setCountdown(cacheTTL);
+
+      const interval = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(interval);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [cacheTTL, cacheStatus]);
 
   const handleAddRobot = async (e) => {
     e.preventDefault();
@@ -44,6 +68,36 @@ function TechnicalDashboard({ robots, role, fetchRobots }) {
     }
   };
 
+  const loadHistory = async (robotId) => {
+    setLoadingHistory(true);
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(
+        `http://localhost:3002/robots/${robotId}/history`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      // reading headers
+      const cacheStatusHeader = response.headers["x-cache-status"];
+      const cacheTTLHeader = parseInt(response.headers["x-cache-ttl"]);
+
+      setHistory(response.data);
+      setCacheStatus(cacheStatusHeader);
+      setCacheTTL(cacheTTLHeader);
+
+      console.log(
+        `Loaded ${response.data.length} positions [Cache: ${cacheStatusHeader}, TTL: ${cacheTTLHeader}s]`
+      );
+    } catch (err) {
+      console.error("Failed to load history:", err);
+      setHistory([]);
+      setCacheStatus(null);
+      setCacheTTL(null);
+    } finally {
+      setLoadingHistory(false);
+    }
+  };
+
   const downloadJSON = () => {
     const data = {
       timestamp: new Date().toISOString(),
@@ -61,7 +115,6 @@ function TechnicalDashboard({ robots, role, fetchRobots }) {
     URL.revokeObjectURL(url);
   };
 
-  // Безопасное форматирование координат
   const formatCoord = (value) => {
     const num = parseFloat(value);
     return isNaN(num) ? "N/A" : num.toFixed(4);
@@ -155,7 +208,12 @@ function TechnicalDashboard({ robots, role, fetchRobots }) {
                   {robots.map((robot) => (
                     <tr
                       key={robot.id}
-                      onClick={() => setSelectedRobot(robot)}
+                      onClick={() => {
+                        setSelectedRobot(robot);
+                        setHistory([]);
+                        setCacheStatus(null);
+                        setCacheTTL(null);
+                      }}
                       className={
                         selectedRobot?.id === robot.id ? "selected" : ""
                       }
@@ -182,12 +240,18 @@ function TechnicalDashboard({ robots, role, fetchRobots }) {
               <div className="details-header">
                 <h3>Robot Details</h3>
                 <button
-                  onClick={() => setSelectedRobot(null)}
+                  onClick={() => {
+                    setSelectedRobot(null);
+                    setHistory([]);
+                    setCacheStatus(null);
+                    setCacheTTL(null);
+                  }}
                   className="btn-close"
                 >
                   ×
                 </button>
               </div>
+
               <div className="details">
                 <div className="detail">
                   <span>ID</span>
@@ -216,6 +280,72 @@ function TechnicalDashboard({ robots, role, fetchRobots }) {
                   </span>
                 </div>
               </div>
+
+              {history.length === 0 && !loadingHistory && (
+                <div className="load-history-link">
+                  <button
+                    onClick={() => loadHistory(selectedRobot.id)}
+                    className="link-button"
+                  >
+                    <History size={14} />
+                    <span>Load Positions</span>
+                  </button>
+                </div>
+              )}
+
+              {loadingHistory && (
+                <div className="loading-history">Loading positions...</div>
+              )}
+
+              {history.length > 0 && (
+                <div className="history-section">
+                  <div className="history-header">
+                    <h4>Position History</h4>
+                    <div className="cache-info">
+                      {/* Cache Status */}
+                      <span
+                        className={`cache-badge ${cacheStatus?.toLowerCase()}`}
+                      >
+                        {cacheStatus === "HIT" ? "Cached" : "From DB"}
+                      </span>
+                      {/* TTL with timer */}
+                      {cacheStatus === "HIT" && countdown > 0 && (
+                        <span className="cache-ttl">
+                          <Clock size={12} />
+                          {countdown}s
+                        </span>
+                      )}
+                      <span className="history-count">{history.length}</span>
+                    </div>
+                  </div>
+                  <div className="history-table-wrap">
+                    <table className="history-table">
+                      <thead>
+                        <tr>
+                          <th>#</th>
+                          <th>Time</th>
+                          <th>Latitude</th>
+                          <th>Longitude</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {history.map((pos, idx) => (
+                          <tr key={idx}>
+                            <td className="mono small">{idx + 1}</td>
+                            <td className="mono small">
+                              {new Date(pos.recorded_at).toLocaleTimeString(
+                                "de-DE"
+                              )}
+                            </td>
+                            <td className="mono">{formatCoordLong(pos.lat)}</td>
+                            <td className="mono">{formatCoordLong(pos.lon)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Login from "./components/Login";
 import Dashboard from "./components/Dashboard";
 import Header from "./components/Header";
+import Footer from "./components/Footer";
 import "./App.css";
 
 function App() {
@@ -26,14 +27,17 @@ function App() {
   return (
     <div className="app">
       <div className="app-bg"></div>
-
       {token ? (
         <>
           <Header onLogout={handleLogout} />
           <Dashboard token={token} onLogout={handleLogout} />
+          <Footer />
         </>
       ) : (
-        <Login onLogin={handleLogin} />
+        <>
+          <Login onLogin={handleLogin} />
+          <Footer />
+        </>
       )}
     </div>
   );

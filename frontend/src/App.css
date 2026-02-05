@@ -1,18 +1,22 @@
 .app {
   position: relative;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .app-bg {
   position: fixed;
   inset: 0;
   z-index: 0;
-  background-image: radial-gradient(
-    circle,
-    rgba(163, 163, 163, 0.4) 0.2px,
-    transparent 1px
-  );
-  background-size: 32px 32px;
+  background-image: radial-gradient(circle, transparent 100%),
+    radial-gradient(circle at 25% 25%, transparent 100%),
+    radial-gradient(
+      circle,
+      rgba(var(--text-tertiary), 0.7) 0.8px,
+      transparent 1px
+    );
+  background-size: 24px 24px;
   pointer-events: none;
 }
 
@@ -21,11 +25,14 @@
 }
 
 [data-theme="dark"] .app-bg {
-  background-image: radial-gradient(
-    circle,
-    rgba(163, 163, 163, 0.3) 0.2px,
-    transparent 1px
-  );
+  background-image: radial-gradient(circle, transparent 100%),
+    radial-gradient(circle at 25% 25%, transparent 100%),
+    radial-gradient(
+      circle,
+      rgba(var(--text-tertiary), 0.7) 0.8px,
+      transparent 1px
+    );
+  background-size: 24px 24px;
 }
 
 .app > *:not(.app-bg) {

@@ -34,7 +34,7 @@
   padding: 1rem 1.5rem;
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 4rem;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -91,7 +91,7 @@
 }
 
 .nav-link {
-  font-size: 0.875rem;
+  font-size: 1rem;
   font-weight: 500;
   color: rgb(82, 82, 82);
   text-decoration: none;
@@ -139,17 +139,22 @@
   padding: 0.5rem 1rem;
   font-size: 0.875rem;
   font-weight: 500;
-  background: rgba(37, 99, 235, 0.1);
-  border: 1px solid rgba(37, 99, 235, 0.2);
-  border-radius: 9999px;
-  color: rgb(37, 99, 235);
+  background: transparent;
+  border: 1px solid rgb(220, 38, 38);
+  border-radius: 0.5rem;
+  color: rgb(220, 38, 38);
+  transition: all 0.15s ease;
+}
+
+.role-badge:hover {
+  background: rgba(220, 38, 38, 0.05);
 }
 
 .role-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: rgb(37, 99, 235);
+  background: rgb(220, 38, 38);
   animation: pulse 2s ease-in-out infinite;
 }
 
@@ -163,45 +168,17 @@
   }
 }
 
-/* Role-specific colors */
-.role-badge[data-role="admin"] {
-  background: rgba(220, 38, 38, 0.1);
-  border-color: rgba(220, 38, 38, 0.3);
-  color: rgb(220, 38, 38);
+[data-theme="dark"] .role-badge {
+  border-color: rgb(239, 68, 68);
+  color: rgb(239, 68, 68);
 }
 
-.role-badge[data-role="admin"] .role-dot {
-  background: rgb(220, 38, 38);
+[data-theme="dark"] .role-badge:hover {
+  background: rgba(239, 68, 68, 0.1);
 }
 
-.role-badge[data-role="technician"] {
-  background: rgba(37, 99, 235, 0.1);
-  border-color: rgba(37, 99, 235, 0.3);
-  color: rgb(37, 99, 235);
-}
-
-.role-badge[data-role="technician"] .role-dot {
-  background: rgb(37, 99, 235);
-}
-
-.role-badge[data-role="economist"] {
-  background: rgba(168, 85, 247, 0.1);
-  border-color: rgba(168, 85, 247, 0.3);
-  color: rgb(168, 85, 247);
-}
-
-.role-badge[data-role="economist"] .role-dot {
-  background: rgb(168, 85, 247);
-}
-
-.role-badge[data-role="user"] {
-  background: rgba(34, 197, 94, 0.1);
-  border-color: rgba(34, 197, 94, 0.3);
-  color: rgb(34, 197, 94);
-}
-
-.role-badge[data-role="user"] .role-dot {
-  background: rgb(34, 197, 94);
+[data-theme="dark"] .role-dot {
+  background: rgb(239, 68, 68);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -343,8 +320,9 @@
   text-align: center;
   font-size: 1.125rem;
   font-weight: 600;
-  color: rgb(37, 99, 235);
-  background: rgba(37, 99, 235, 0.1);
+  color: rgb(220, 38, 38);
+  background: transparent;
+  border: 1px solid rgb(220, 38, 38);
   border-radius: 0.5rem;
 }
 

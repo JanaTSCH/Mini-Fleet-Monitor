@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import "ol/ol.css";
+import "../styles/map.css";
 import Map from "ol/Map";
 import View from "ol/View";
 import TileLayer from "ol/layer/Tile";
@@ -11,7 +12,6 @@ import Point from "ol/geom/Point";
 import { fromLonLat } from "ol/proj";
 import { Style, Icon, Text, Fill } from "ol/style";
 
-// MapPin черный (из Lucide)
 const MAP_PIN_ICON =
   "data:image/svg+xml," +
   encodeURIComponent(`
@@ -42,12 +42,23 @@ function MapComponent({ robots }) {
           }),
           text: new Text({
             text: feature.get("name"),
-            offsetY: -32,
+            offsetY: -35,
             font: "bold 12px sans-serif",
             fill: new Fill({ color: "#000" }),
           }),
         }),
     });
+
+    // Calculate center from robots
+    let center = [11.0328, 50.9787]; // Default Erfurt
+    if (robots && robots.length > 0) {
+      const firstRobot = robots[0];
+      const lon = parseFloat(firstRobot.lon || firstRobot.longitude);
+      const lat = parseFloat(firstRobot.lat || firstRobot.latitude);
+      if (!isNaN(lon) && !isNaN(lat)) {
+        center = [lon, lat];
+      }
+    }
 
     mapInstanceRef.current = new Map({
       target: mapRef.current,
@@ -60,27 +71,32 @@ function MapComponent({ robots }) {
         vectorLayer,
       ],
       view: new View({
-        center: fromLonLat([11.0328, 50.9787]),
-        zoom: 14,
+        center: fromLonLat(center),
+        zoom: 16, // Closer zoom for single robot
       }),
     });
 
     return () => mapInstanceRef.current?.setTarget(null);
   }, []);
 
+  // Update robots and recenter map
   useEffect(() => {
     if (!vectorSourceRef.current || !robots) return;
 
     robots.forEach((robot) => {
-      const coords = fromLonLat([
-        parseFloat(robot.lon || robot.longitude),
-        parseFloat(robot.lat || robot.latitude),
-      ]);
+      const lon = parseFloat(robot.lon || robot.longitude);
+      const lat = parseFloat(robot.lat || robot.latitude);
+
+      if (isNaN(lon) || isNaN(lat)) return;
+
+      const coords = fromLonLat([lon, lat]);
 
       const existing = featuresRef.current[robot.id];
 
       if (existing && vectorSourceRef.current.hasFeature(existing)) {
         existing.getGeometry().setCoordinates(coords);
+        existing.set("name", robot.name);
+        existing.changed();
       } else {
         const feature = new Feature({
           geometry: new Point(coords),
@@ -88,6 +104,14 @@ function MapComponent({ robots }) {
         });
         featuresRef.current[robot.id] = feature;
         vectorSourceRef.current.addFeature(feature);
+      }
+
+      // Center map on this robot
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.getView().animate({
+          center: coords,
+          duration: 1000,
+        });
       }
     });
   }, [robots]);

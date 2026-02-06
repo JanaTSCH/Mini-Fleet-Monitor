@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Play, Plus, Download, History, Clock } from "lucide-react";
+import {
+  Play,
+  Plus,
+  Download,
+  History,
+  Clock,
+  Battery,
+  BatteryCharging,
+} from "lucide-react";
 import Map from "./Map";
 import "../styles/technicalDashboard.css";
 
@@ -125,6 +133,11 @@ function TechnicalDashboard({ robots, role, fetchRobots }) {
     return isNaN(num) ? "N/A" : num.toFixed(6);
   };
 
+  const getBatteryIcon = (level) => {
+    if (level > 20) return <Battery size={14} />;
+    return <BatteryCharging size={14} className="battery-low" />;
+  };
+
   return (
     <div className="tech-dashboard">
       <div className="container">
@@ -198,9 +211,9 @@ function TechnicalDashboard({ robots, role, fetchRobots }) {
               <table>
                 <thead>
                   <tr>
-                    <th>ID</th>
                     <th>Name</th>
                     <th>Status</th>
+                    <th>Battery</th>
                     <th>Position</th>
                   </tr>
                 </thead>
@@ -218,11 +231,21 @@ function TechnicalDashboard({ robots, role, fetchRobots }) {
                         selectedRobot?.id === robot.id ? "selected" : ""
                       }
                     >
-                      <td className="mono">#{robot.id}</td>
+                      {/* <td className="mono">#{robot.id}</td> */}
                       <td className="bold">{robot.name}</td>
                       <td>
                         <span className={`badge ${robot.status}`}>
                           {robot.status}
+                        </span>
+                      </td>
+                      <td>
+                        <span
+                          className={`battery-level ${
+                            robot.battery <= 20 ? "low" : ""
+                          }`}
+                        >
+                          {getBatteryIcon(robot.battery)}
+                          {robot.battery}%
                         </span>
                       </td>
                       <td className="mono small">

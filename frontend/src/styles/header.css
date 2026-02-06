@@ -245,7 +245,7 @@
   background: rgba(245, 245, 245, 0.5);
   border-color: rgba(229, 229, 229, 0.8);
   color: rgb(23, 23, 23);
-  transform: translateY(-1px);
+  /* transform: translateY(-1px); */
 }
 
 [data-theme="dark"] .icon-btn:hover {
@@ -280,9 +280,9 @@
 }
 
 .lang-btn:hover {
-  background: rgba(37, 99, 235, 0.1);
-  border-color: rgba(37, 99, 235, 0.3);
-  color: rgb(37, 99, 235);
+  background: rgba(255, 0, 0, 0.1);
+  border-color: rgba(235, 37, 37, 0.3);
+  color: rgb(235, 37, 37);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════

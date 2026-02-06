@@ -5,9 +5,11 @@ export default function SpotlightText({
   className = "",
   glowColor = "#DC2626",
   baseColor = "#99a3b3",
+  glowRadius = 150,
+  activationZone = 600,
 }) {
   const textRef = useRef(null);
-  const [position, setPosition] = useState({ x: 50, y: 50 });
+  const [position, setPosition] = useState({ x: -500, y: -500 });
   const [isHovered, setIsHovered] = useState(false);
 
   const handleMouseMove = (e) => {
@@ -20,38 +22,46 @@ export default function SpotlightText({
 
   return (
     <div
-      ref={textRef}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      className={className}
       style={{
         position: "relative",
         cursor: "default",
+        // ← Расширяем зону реакции через padding
+        padding: `${activationZone}px`,
+        margin: `-${activationZone}px`,
       }}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Базовый текст (всегда виден, серый) */}
-      <div style={{ color: baseColor }}>{children}</div>
+      <div
+        ref={textRef}
+        className={className}
+        style={{
+          position: "relative",
+        }}
+      >
+        {/* Базовый текст (всегда виден, серый) */}
+        <div style={{ color: baseColor }}>{children}</div>
 
-      {/* Светящийся текст поверх (красный, через маску) */}
-      {isHovered && (
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            pointerEvents: "none",
-            color: glowColor,
-            // КЛЮЧ: maskImage создаёт "окно" которое показывает красный текст
-            maskImage: `radial-gradient(circle 150px at ${position.x}px ${position.y}px, black, transparent)`,
-            WebkitMaskImage: `radial-gradient(circle 150px at ${position.x}px ${position.y}px, black, transparent)`,
-          }}
-        >
-          {children}
-        </div>
-      )}
+        {/* Светящийся текст поверх (красный, через маску) */}
+        {isHovered && (
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              pointerEvents: "none",
+              color: glowColor,
+              maskImage: `radial-gradient(circle ${glowRadius}px at ${position.x}px ${position.y}px, black, transparent)`,
+              WebkitMaskImage: `radial-gradient(circle ${glowRadius}px at ${position.x}px ${position.y}px, black, transparent)`,
+            }}
+          >
+            {children}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

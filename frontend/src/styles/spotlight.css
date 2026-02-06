@@ -30,3 +30,8 @@
 .spotlight-text:hover::before {
   opacity: 1;
 }
+
+.spotlight-text::before {
+  z-index: -1;
+  transition: opacity 0.3s ease;
+}

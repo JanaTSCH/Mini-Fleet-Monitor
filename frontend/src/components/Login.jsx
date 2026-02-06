@@ -68,6 +68,8 @@ function Login({ onLogin }) {
               className="login-brand-title"
               glowColor="#DC2626"
               baseColor="#bac1c5"
+              glowRadius={150}
+              activationZone={600}
             >
               RoboFleet Sicherheit
             </SpotlightText>

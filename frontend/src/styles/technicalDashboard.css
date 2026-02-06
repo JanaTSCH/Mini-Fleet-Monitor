@@ -96,6 +96,7 @@ th {
   font-weight: 600;
   color: rgb(var(--text-secondary));
   border-bottom: 1px solid rgba(var(--border), 0.3);
+  min-width: 80px;
 }
 
 td {
@@ -204,6 +205,50 @@ tbody tr.selected {
 .badge.charging {
   background: rgba(var(--color-warning), 0.2);
   color: rgb(var(--color-warning));
+  margin-right: 2px;
+}
+
+/* Батарея */
+.battery-level {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgb(var(--text-secondary));
+}
+
+.battery-level.low {
+  color: rgb(var(--color-error));
+}
+
+.battery-level svg {
+  flex-shrink: 0;
+}
+
+.battery-low {
+  color: rgb(var(--color-error));
+  animation: battery-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes battery-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Столбец батареи */
+table th:nth-child(4) {
+  min-width: 80px;
+  text-align: center;
+}
+
+table td:nth-child(4) {
+  text-align: center;
 }
 
 /* ========================

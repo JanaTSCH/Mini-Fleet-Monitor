@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Edit2, Play, Plus, Trash2, Users, X } from "lucide-react";
+import { Edit2, Play, Pause, Plus, Trash2, Users, X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import "../styles/adminDashboard.css";
 import Map from "./Map";
@@ -11,6 +11,7 @@ function AdminDashboard({ robots: initialRobots, fetchRobots }) {
   const [showAddRobot, setShowAddRobot] = useState(false);
   const [showUserPanel, setShowUserPanel] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
+  const [simulationRunning, setSimulationRunning] = useState(true);
 
   const [newRobot, setNewRobot] = useState({
     name: "",
@@ -100,10 +101,14 @@ function AdminDashboard({ robots: initialRobots, fetchRobots }) {
   const handleToggleSimulation = async () => {
     try {
       const token = localStorage.getItem("token");
-      await axios.post(
+      const response = await axios.post(
         "http://localhost:3002/simulation/toggle",
         {},
         { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setSimulationRunning(response.data.running);
+      console.log(
+        `✅ Simulation ${response.data.running ? "started" : "paused"}`
       );
     } catch (err) {
       console.error("Simulation failed:", err);
@@ -147,17 +152,19 @@ function AdminDashboard({ robots: initialRobots, fetchRobots }) {
         <div className="toolbar-left">
           <button
             onClick={handleToggleSimulation}
-            className="btn-primary btn-md"
+            className={
+              simulationRunning ? "btn-primary btn-md" : "btn-secondary btn-md"
+            }
           >
-            <Play size={16} />
-            Toggle Simulation
+            {simulationRunning ? <Pause size={16} /> : <Play size={16} />}
+            {simulationRunning ? "Pause Simulation" : "Start Simulation"}
           </button>
           <button
             onClick={() => setShowAddRobot(!showAddRobot)}
             className="btn-secondary btn-md"
           >
             {showAddRobot ? <X size={16} /> : <Plus size={16} />}
-            Robot
+            {showAddRobot ? "Cancel" : "Add Robot"}
           </button>
           <button
             onClick={() => setShowUserPanel(!showUserPanel)}
@@ -261,10 +268,10 @@ function AdminDashboard({ robots: initialRobots, fetchRobots }) {
             <table className="user-table">
               <thead>
                 <tr>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Role</th>
-                  <th>Actions</th>
+                  <th style={{ minWidth: "120px" }}>Name</th>
+                  <th style={{ minWidth: "180px" }}>Email</th>
+                  <th style={{ minWidth: "100px", width: "100px" }}>Role</th>
+                  <th style={{ minWidth: "100px", width: "100px" }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -273,7 +280,9 @@ function AdminDashboard({ robots: initialRobots, fetchRobots }) {
                     <td className="bold">{user.name}</td>
                     <td className="mono small">{user.email}</td>
                     <td>
-                      <span className={`badge ${user.role}`}>{user.role}</span>
+                      <span className={`badge role-${user.role}`}>
+                        {user.role}
+                      </span>
                     </td>
                     <td>
                       <button
@@ -307,7 +316,7 @@ function AdminDashboard({ robots: initialRobots, fetchRobots }) {
             <h4>Edit User</h4>
             <form
               onSubmit={handleEditUser}
-              className="add-form"
+              className="user-form"
               style={{ padding: 0 }}
             >
               <input
@@ -366,10 +375,26 @@ function AdminDashboard({ robots: initialRobots, fetchRobots }) {
             <table>
               <thead>
                 <tr>
-                  <th>Name</th>
-                  <th>Status</th>
-                  <th>Battery</th>
-                  <th>Actions</th>
+                  <th style={{ minWidth: "120px" }}>Name</th>
+                  <th style={{ minWidth: "100px", width: "100px" }}>Status</th>
+                  <th
+                    style={{
+                      minWidth: "80px",
+                      width: "80px",
+                      textAlign: "center",
+                    }}
+                  >
+                    Battery
+                  </th>
+                  <th
+                    style={{
+                      minWidth: "80px",
+                      width: "80px",
+                      textAlign: "center",
+                    }}
+                  >
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -385,8 +410,10 @@ function AdminDashboard({ robots: initialRobots, fetchRobots }) {
                         {robot.status}
                       </span>
                     </td>
-                    <td className="mono">{robot.battery}%</td>
-                    <td>
+                    <td className="mono" style={{ textAlign: "center" }}>
+                      {robot.battery}%
+                    </td>
+                    <td style={{ textAlign: "center" }}>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();

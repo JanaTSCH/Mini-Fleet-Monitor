@@ -1,9 +1,6 @@
-/*
-╔════════════════════════════════════════════════════════════════════════════╗
-║  COMPONENTS - NO INLINE STYLES                                             ║
-║  Все стили через глобальные переменные                                     ║
-╚════════════════════════════════════════════════════════════════════════════╝
-*/
+/* ═══════════════════════════════════════════════════════════════════════
+   COMPONENTS - БЕЗ АНИМАЦИЙ
+   ═══════════════════════════════════════════════════════════════════════ */
 
 /* ═══════════════════════════════════════════════════════════════════════
    BUTTON
@@ -14,19 +11,16 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-
   font-family: var(--font-sans);
   font-weight: var(--font-medium);
   font-size: var(--text-sm);
   line-height: 1;
   text-decoration: none;
   white-space: nowrap;
-
   border: none;
   border-radius: var(--radius-md);
   cursor: pointer;
-
-  transition: all var(--transition-fast);
+  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
   user-select: none;
 }
 
@@ -59,13 +53,10 @@
 
 .btn-primary:hover:not(:disabled) {
   background: rgb(var(--primary-hover));
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
 }
 
 .btn-primary:active:not(:disabled) {
   background: rgb(var(--primary-active));
-  transform: translateY(0);
 }
 
 .btn-secondary {
@@ -90,53 +81,51 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   CARD
-   ═══════════════════════════════════════════════════════════════════════ */
+     CARD
+     ═══════════════════════════════════════════════════════════════════════ */
 
 .card {
   background: rgb(var(--surface));
   border: 1px solid rgb(var(--border));
   border-radius: var(--radius-lg);
-  transition: all var(--transition-fast);
+  transition: border-color 150ms ease;
 }
 
 .card-hover:hover {
   border-color: rgb(var(--border-hover));
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
 }
 
 .card-p-sm {
   padding: var(--space-4);
 }
+
 .card-p-md {
   padding: var(--space-6);
 }
+
 .card-p-lg {
   padding: var(--space-8);
 }
+
 .card-p-none {
   padding: 0;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   INPUT
-   ═══════════════════════════════════════════════════════════════════════ */
+     INPUT
+     ═══════════════════════════════════════════════════════════════════════ */
 
 .input {
   width: 100%;
   padding: var(--space-3) var(--space-4);
-
   font-family: var(--font-sans);
   font-size: var(--text-sm);
   line-height: var(--leading-normal);
   color: rgb(var(--text-primary));
-
   background: rgb(var(--surface));
   border: 1px solid rgb(var(--border));
   border-radius: var(--radius-md);
-
-  transition: all var(--transition-fast);
+  transition: border-color 150ms ease;
   outline: none;
 }
 
@@ -155,18 +144,16 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   BADGE
-   ═══════════════════════════════════════════════════════════════════════ */
+     BADGE
+     ═══════════════════════════════════════════════════════════════════════ */
 
 .badge {
   display: inline-flex;
   align-items: center;
   padding: var(--space-1) var(--space-3);
-
   font-size: var(--text-xs);
   font-weight: var(--font-medium);
   line-height: 1;
-
   border-radius: var(--radius-full);
 }
 
@@ -191,26 +178,23 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   HEADER
-   ═══════════════════════════════════════════════════════════════════════ */
+     HEADER
+     ═══════════════════════════════════════════════════════════════════════ */
 
 .header {
   position: sticky;
   top: 0;
   z-index: 50;
-
   background: rgba(var(--surface), 0.8);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid rgb(var(--border));
-
-  transition: all var(--transition-base);
+  transition: background 150ms ease;
 }
 
 .header-content {
   max-width: 1200px;
   margin: 0 auto;
   padding: var(--space-4) var(--space-6);
-
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -218,8 +202,8 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   PAGE LAYOUT
-   ═══════════════════════════════════════════════════════════════════════ */
+     PAGE LAYOUT
+     ═══════════════════════════════════════════════════════════════════════ */
 
 .page {
   min-height: 100vh;
@@ -236,8 +220,8 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   BACKGROUND PATTERNS
-   ═══════════════════════════════════════════════════════════════════════ */
+     BACKGROUND PATTERNS
+     ═══════════════════════════════════════════════════════════════════════ */
 
 .bg-dots {
   background-image: radial-gradient(
@@ -257,8 +241,8 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   RESPONSIVE
-   ═══════════════════════════════════════════════════════════════════════ */
+     RESPONSIVE
+     ═══════════════════════════════════════════════════════════════════════ */
 
 @media (max-width: 768px) {
   .container {

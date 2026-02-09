@@ -59,7 +59,6 @@
   border-radius: var(--radius-md);
   color: rgb(var(--text-tertiary));
   cursor: pointer;
-  transition: all var(--transition-fast);
 }
 
 .modal-close:hover {
@@ -114,7 +113,6 @@
   border: 2px solid transparent;
   border-radius: var(--radius-lg);
   cursor: pointer;
-  transition: all var(--transition-fast);
   display: flex;
   flex-direction: column;
   gap: var(--space-2);

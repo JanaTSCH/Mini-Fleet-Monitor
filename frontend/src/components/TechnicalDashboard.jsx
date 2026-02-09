@@ -2,12 +2,14 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import {
   Play,
+  Pause,
   Plus,
   Download,
   History,
   Clock,
   Battery,
   BatteryCharging,
+  X,
 } from "lucide-react";
 import Map from "./Map";
 import "../styles/technicalDashboard.css";
@@ -142,15 +144,18 @@ function TechnicalDashboard({ robots, role, fetchRobots }) {
     <div className="tech-dashboard">
       <div className="toolbar">
         <div className="toolbar-left">
-          <button onClick={toggleSimulation} className="btn-primary">
-            <Play size={16} />
-            {simulationRunning ? "Pause" : "Start"}
+          <button
+            onClick={toggleSimulation}
+            className={simulationRunning ? "btn-primary" : "btn-secondary"}
+          >
+            {simulationRunning ? <Pause size={16} /> : <Play size={16} />}
+            {simulationRunning ? "Pause Simulation" : "Start Simulation"}
           </button>
           <button
             onClick={() => setShowAddForm(!showAddForm)}
             className="btn-secondary"
           >
-            <Plus size={16} />
+            {showAddForm ? <X size={16} /> : <Plus size={16} />}
             {showAddForm ? "Cancel" : "Add Robot"}
           </button>
         </div>

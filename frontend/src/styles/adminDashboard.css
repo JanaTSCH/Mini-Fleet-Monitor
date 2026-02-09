@@ -67,7 +67,6 @@ button {
   gap: 0.5rem;
   font-weight: 600;
   font-size: 0.875rem;
-  transition: all 150ms ease;
 }
 
 .btn-primary {

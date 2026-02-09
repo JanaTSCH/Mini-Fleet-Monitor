@@ -74,9 +74,9 @@
   --secondary: var(--color-blue-600);
   --secondary-hover: var(--color-blue-700);
 
-  --bg-primary: var(--color-gray-50);
-  --bg-secondary: var(--color-gray-100);
-  --bg-tertiary: var(--color-gray-200);
+  --bg-primary: var(--color-gray-100);
+  --bg-secondary: var(--color-gray-200);
+  --bg-tertiary: var(--color-gray-300);
   --surface: 255, 255, 255;
   --surface-hover: var(--color-gray-50);
   --text-primary: var(--color-gray-900);

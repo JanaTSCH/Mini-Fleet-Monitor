@@ -107,6 +107,7 @@ button {
 .btn-icon {
   padding: 0.25rem 0.5rem;
   background: transparent;
+  color: rgb(var(--text-secondary));
   border: 1px solid rgba(var(--border), 0.3);
   border-radius: 0.5rem;
 }

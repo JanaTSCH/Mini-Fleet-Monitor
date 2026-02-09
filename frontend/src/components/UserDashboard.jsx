@@ -19,36 +19,55 @@ function UserDashboard({ robots, fetchRobots }) {
   const myRobot = robots[0] || null;
   const cardRef = useRef(null);
 
-  const [battery, setBattery] = useState(myRobot?.battery || 100);
-  const [status, setStatus] = useState(myRobot?.status || "moving");
+  const [battery, setBattery] = useState(myRobot?.battery || 30);
+  const [status, setStatus] = useState("moving");
   const [isCharging, setIsCharging] = useState(false);
   const [chargeTarget, setChargeTarget] = useState(100);
   const [notification, setNotification] = useState(null);
+  const [position, setPosition] = useState({
+    lat: parseFloat(myRobot?.lat || 50.9787),
+    lon: parseFloat(myRobot?.lon || 11.0328),
+  });
 
   useEffect(() => {
-    if (!myRobot || isCharging) return;
+    if (!myRobot) return;
 
     const interval = setInterval(() => {
-      setBattery((prev) => {
-        const newBattery = Math.max(0, prev - 0.5); //
+      // move and battery
+      if (!isCharging && battery > 0) {
+        setBattery((prev) => {
+          const newBat = Math.max(0, prev - 0.5);
+          if (newBat <= 20 && prev > 20)
+            showNotification("Battery Low", "warning");
+          if (newBat <= 10 && prev > 10)
+            showNotification("Critical Battery Level", "error");
+          if (newBat === 0) {
+            setStatus("idle");
+            showNotification("Battery Depleted", "error");
+          } else {
+            setStatus("moving");
+          }
+          return newBat;
+        });
 
-        if (newBattery <= 20 && prev > 20) {
-          showNotification("Battery Low", "warning");
-        }
-        if (newBattery <= 10 && prev > 10) {
-          showNotification("Critical Battery Level", "error");
-        }
-        if (newBattery === 0) {
-          showNotification("Battery Depleted", "error");
-        }
-
-        return newBattery;
-      });
+        // random moving
+        setPosition((prev) => ({
+          lat: Math.max(
+            50.9,
+            Math.min(51.0, prev.lat + (Math.random() - 0.5) * 0.001)
+          ),
+          lon: Math.max(
+            11.0,
+            Math.min(11.1, prev.lon + (Math.random() - 0.5) * 0.001)
+          ),
+        }));
+      }
     }, 2000);
 
     return () => clearInterval(interval);
-  }, [myRobot, isCharging]);
+  }, [myRobot, isCharging, battery]); // Зависимость от battery предотвращает зацикливание
 
+  // Зарядка
   useEffect(() => {
     if (!isCharging) return;
 
@@ -56,8 +75,8 @@ function UserDashboard({ robots, fetchRobots }) {
       setBattery((prev) => {
         if (prev >= chargeTarget) {
           setIsCharging(false);
-          setStatus("idle");
-          showNotification(`Charging Complete`, "success");
+          setStatus("moving");
+          showNotification("Charging Complete", "success");
           return chargeTarget;
         }
         return Math.min(chargeTarget, prev + 1);
@@ -82,17 +101,19 @@ function UserDashboard({ robots, fetchRobots }) {
       setStatus("charging");
       showNotification(`Charging to ${chargeTarget}%`, "info");
     } else if (command === "HOME") {
-      if (battery === 0) {
-        showNotification("Cannot move - battery depleted", "error");
+      if (battery === 0 || isCharging) {
+        showNotification("Cannot move - battery depleted or charging", "error");
         return;
       }
+      setStatus("moving");
       showNotification("Returning home", "info");
+      // to Erfurt
+      setPosition({ lat: 50.9787, lon: 11.0328 });
     }
   };
 
   const handleMouseMove = (e) => {
-    if (!cardRef.current) return;
-
+    if (!cardRef.current || battery === 0 || isCharging) return;
     const card = cardRef.current;
     const rect = card.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -101,23 +122,14 @@ function UserDashboard({ robots, fetchRobots }) {
     const centerY = rect.height / 2;
     const rotateX = (y - centerY) / 20;
     const rotateY = (centerX - x) / 20;
-
     card.style.transform = `
-      perspective(1000px)
-      rotateX(${rotateX}deg)
-      rotateY(${rotateY}deg)
-      scale3d(1.02, 1.02, 1.02)
+      perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)
     `;
   };
 
   const handleMouseLeave = () => {
     if (!cardRef.current) return;
-    cardRef.current.style.transform = `
-      perspective(1000px)
-      rotateX(0deg)
-      rotateY(0deg)
-      scale3d(1, 1, 1)
-    `;
+    cardRef.current.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
   };
 
   if (!myRobot) {
@@ -131,8 +143,8 @@ function UserDashboard({ robots, fetchRobots }) {
     );
   }
 
-  const lat = parseFloat(myRobot.lat);
-  const lon = parseFloat(myRobot.lon);
+  const lat = position.lat;
+  const lon = position.lon;
 
   return (
     <div className="user-dashboard">
@@ -158,10 +170,10 @@ function UserDashboard({ robots, fetchRobots }) {
       <div className="dashboard-grid">
         {/* LEFT SIDEBAR */}
         <div className="sidebar-left">
-          {/* Robot Card with 3D */}
+          {/* Robot Card */}
           <div
             ref={cardRef}
-            className="widget robot-card-square"
+            className={`widget robot-card-square ${status}`}
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
           >
@@ -171,7 +183,7 @@ function UserDashboard({ robots, fetchRobots }) {
             </div>
           </div>
 
-          {/* Info Widget with Lucid Icons */}
+          {/* Info Widget */}
           <div className="widget info-compact">
             <div className="info-row">
               <Battery size={20} className="info-icon-lucid" />
@@ -198,7 +210,7 @@ function UserDashboard({ robots, fetchRobots }) {
             </div>
           </div>
 
-          {/* Commands Widget */}
+          {/* Commands */}
           <div className="widget commands-compact">
             <h4 className="widget-subtitle">Commands</h4>
             <div className="commands-list">
@@ -240,16 +252,25 @@ function UserDashboard({ robots, fetchRobots }) {
 
         {/* RIGHT CONTENT */}
         <div className="content-right">
-          {/* Map */}
           <div className="widget map-widget-main">
             <Map
-              robots={[{ ...myRobot, battery: Math.round(battery), status }]}
+              robots={
+                battery > 0 && !isCharging
+                  ? [
+                      {
+                        ...myRobot,
+                        lat: position.lat,
+                        lon: position.lon,
+                        battery: Math.round(battery),
+                        status,
+                      },
+                    ]
+                  : []
+              }
             />
           </div>
 
-          {/* Support & Guide */}
           <div className="bottom-row">
-            {/* Support */}
             <div className="widget support-widget">
               <div className="widget-header">
                 <Headphones size={18} />
@@ -265,8 +286,8 @@ function UserDashboard({ robots, fetchRobots }) {
                   <span>+49 800 123 4567</span>
                 </a>
                 <button
-                  onClick={() => showNotification("Live chat opening", "info")}
                   className="support-item clickable"
+                  onClick={() => showNotification("Live chat opening", "info")}
                 >
                   <MessageCircle size={16} />
                   <span>Live Chat</span>
@@ -274,7 +295,6 @@ function UserDashboard({ robots, fetchRobots }) {
               </div>
             </div>
 
-            {/* User Guide */}
             <div className="widget guide-widget">
               <div className="widget-header">
                 <Book size={18} />
@@ -282,24 +302,24 @@ function UserDashboard({ robots, fetchRobots }) {
               </div>
               <div className="guide-list">
                 <button
+                  className="guide-item"
                   onClick={() =>
                     showNotification("Opening user manual", "info")
                   }
-                  className="guide-item"
                 >
                   Quick Start Guide
                 </button>
                 <button
+                  className="guide-item"
                   onClick={() =>
                     showNotification("Opening video tutorials", "info")
                   }
-                  className="guide-item"
                 >
                   Video Tutorials
                 </button>
                 <button
-                  onClick={() => showNotification("Opening FAQ", "info")}
                   className="guide-item"
+                  onClick={() => showNotification("Opening FAQ", "info")}
                 >
                   FAQ & Troubleshooting
                 </button>

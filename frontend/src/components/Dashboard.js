@@ -3,6 +3,8 @@ import axios from "axios";
 import io from "socket.io-client";
 import UserDashboard from "./UserDashboard";
 import TechnicalDashboard from "./TechnicalDashboard";
+import EconomistDashboard from "./EconomistDashboard";
+import AdminDashboard from "./AdminDashboard";
 import "../styles/dashboard.css";
 
 function Dashboard({ token, onLogout }) {
@@ -20,12 +22,22 @@ function Dashboard({ token, onLogout }) {
 
     // Socket.io для real-time обновлений
     const socket = io("http://localhost:3002");
+
+    socket.on("connect", () => {
+      console.log("✅ Socket.IO connected");
+    });
+
     socket.on("robotUpdate", (data) => {
+      console.log("📡 Robot update:", data);
       setRobots((prev) =>
         prev.map((robot) =>
           robot.id === data.id ? { ...robot, ...data } : robot
         )
       );
+    });
+
+    socket.on("disconnect", () => {
+      console.log("❌ Socket.IO disconnected");
     });
 
     return () => {
@@ -56,14 +68,35 @@ function Dashboard({ token, onLogout }) {
   }
 
   // Роутинг по ролям
-  if (role === "user") {
-    return <UserDashboard robots={robots} fetchRobots={fetchRobots} />;
-  }
+  switch (role) {
+    case "admin":
+      return <AdminDashboard robots={robots} fetchRobots={fetchRobots} />;
 
-  // admin, technician, economist видят TechnicalDashboard
-  return (
-    <TechnicalDashboard robots={robots} role={role} fetchRobots={fetchRobots} />
-  );
+    case "technician":
+      return (
+        <TechnicalDashboard
+          robots={robots}
+          role={role}
+          fetchRobots={fetchRobots}
+        />
+      );
+
+    case "economist":
+      return <EconomistDashboard robots={robots} fetchRobots={fetchRobots} />;
+
+    case "user":
+      return <UserDashboard robots={robots} fetchRobots={fetchRobots} />;
+
+    default:
+      return (
+        <div className="loading">
+          <p>Unknown role: {role}</p>
+          <button onClick={onLogout} className="btn-primary">
+            Logout
+          </button>
+        </div>
+      );
+  }
 }
 
 export default Dashboard;

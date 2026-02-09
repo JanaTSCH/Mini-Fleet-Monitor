@@ -7,6 +7,7 @@ import { Server } from "socket.io";
 import { initDB } from "./config/db.js";
 import { startSimulation } from "./routes/simulation.js";
 import authRoutes from "./routes/auth.js";
+import userRoutes from "./routes/users.js";
 import robotRoutes from "./routes/robots.js";
 import simulationRoutes from "./routes/simulation.js";
 
@@ -25,6 +26,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/auth", authRoutes);
+app.use("/users", userRoutes);
 app.use("/robots", robotRoutes);
 app.use("/simulation", simulationRoutes);
 

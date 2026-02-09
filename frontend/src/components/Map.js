@@ -10,55 +10,34 @@ import VectorSource from "ol/source/Vector";
 import Feature from "ol/Feature";
 import Point from "ol/geom/Point";
 import { fromLonLat } from "ol/proj";
-import { Style, Icon, Text, Fill } from "ol/style";
+import { Style, Icon, Text, Fill, Stroke } from "ol/style";
+import { boundingExtent } from "ol/extent";
 
 const MAP_PIN_ICON =
   "data:image/svg+xml," +
   encodeURIComponent(`
-  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
-    <circle cx="12" cy="10" r="3"/>
-  </svg>
-`);
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="42" viewBox="0 0 32 42">
+      <path fill="#DC2626" stroke="#fff" stroke-width="2" 
+        d="M16 0C9.4 0 4 5.4 4 12c0 8 12 26 12 26s12-18 12-26c0-6.6-5.4-12-12-12z"/>
+      <circle cx="16" cy="12" r="5" fill="#fff"/>
+    </svg>
+  `);
 
 function MapComponent({ robots }) {
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const vectorSourceRef = useRef(null);
-  const featuresRef = useRef({});
+  const viewRef = useRef(null);
 
+  // 1. map init
   useEffect(() => {
-    if (!mapRef.current) return;
+    if (!mapRef.current || mapInstanceRef.current) return;
 
     vectorSourceRef.current = new VectorSource();
-
-    const vectorLayer = new VectorLayer({
-      source: vectorSourceRef.current,
-      style: (feature) =>
-        new Style({
-          image: new Icon({
-            src: MAP_PIN_ICON,
-            anchor: [0.5, 1],
-          }),
-          text: new Text({
-            text: feature.get("name"),
-            offsetY: -35,
-            font: "bold 12px sans-serif",
-            fill: new Fill({ color: "#000" }),
-          }),
-        }),
+    viewRef.current = new View({
+      center: fromLonLat([11.0328, 50.9787]),
+      zoom: 14,
     });
-
-    // Calculate center from robots
-    let center = [11.0328, 50.9787]; // Default Erfurt
-    if (robots && robots.length > 0) {
-      const firstRobot = robots[0];
-      const lon = parseFloat(firstRobot.lon || firstRobot.longitude);
-      const lat = parseFloat(firstRobot.lat || firstRobot.latitude);
-      if (!isNaN(lon) && !isNaN(lat)) {
-        center = [lon, lat];
-      }
-    }
 
     mapInstanceRef.current = new Map({
       target: mapRef.current,
@@ -68,55 +47,92 @@ function MapComponent({ robots }) {
             url: "https://{a-d}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
           }),
         }),
-        vectorLayer,
+        new VectorLayer({
+          source: vectorSourceRef.current,
+          style: (feature) =>
+            new Style({
+              image: new Icon({
+                src: MAP_PIN_ICON,
+                anchor: [0.5, 1],
+                scale: 0.8,
+              }),
+              text: new Text({
+                text: feature.get("name"),
+                offsetY: -38,
+                font: "bold 13px sans-serif",
+                fill: new Fill({ color: "#171717" }),
+                stroke: new Stroke({ color: "#fff", width: 3 }),
+              }),
+            }),
+        }),
       ],
-      view: new View({
-        center: fromLonLat(center),
-        zoom: 16, // Closer zoom for single robot
-      }),
+      view: viewRef.current,
     });
 
-    return () => mapInstanceRef.current?.setTarget(null);
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.setTarget(null);
+        mapInstanceRef.current = null;
+      }
+    };
   }, []);
 
-  // Update robots and recenter map
+  // 2. robots update (use data from backend)
   useEffect(() => {
-    if (!vectorSourceRef.current || !robots) return;
+    if (!vectorSourceRef.current || !robots || robots.length === 0) return;
 
-    robots.forEach((robot) => {
-      const lon = parseFloat(robot.lon || robot.longitude);
-      const lat = parseFloat(robot.lat || robot.latitude);
+    // clear map
+    vectorSourceRef.current.clear();
 
-      if (isNaN(lon) || isNaN(lat)) return;
+    // add new robots
+    const features = robots
+      .map((robot) => {
+        const lon = parseFloat(robot.lon || robot.longitude);
+        const lat = parseFloat(robot.lat || robot.latitude);
+        if (isNaN(lon) || isNaN(lat)) return null;
 
-      const coords = fromLonLat([lon, lat]);
-
-      const existing = featuresRef.current[robot.id];
-
-      if (existing && vectorSourceRef.current.hasFeature(existing)) {
-        existing.getGeometry().setCoordinates(coords);
-        existing.set("name", robot.name);
-        existing.changed();
-      } else {
-        const feature = new Feature({
-          geometry: new Point(coords),
+        return new Feature({
+          geometry: new Point(fromLonLat([lon, lat])),
           name: robot.name,
         });
-        featuresRef.current[robot.id] = feature;
-        vectorSourceRef.current.addFeature(feature);
-      }
+      })
+      .filter(Boolean);
 
-      // Center map on this robot
-      if (mapInstanceRef.current) {
-        mapInstanceRef.current.getView().animate({
-          center: coords,
-          duration: 1000,
+    vectorSourceRef.current.addFeatures(features);
+
+    // centering
+    if (features.length > 0 && viewRef.current) {
+      const coords = features.map((f) => f.getGeometry().getCoordinates());
+      const extent = boundingExtent(coords);
+
+      if (!mapInstanceRef.current._userMoved) {
+        viewRef.current.fit(extent, {
+          padding: [80, 80, 80, 80],
+          maxZoom: 16,
+          duration: 0,
         });
       }
-    });
+    }
   }, [robots]);
 
-  return <div ref={mapRef} style={{ width: "100%", height: "100%" }} />;
+  // 3. checking if user moved the map
+  useEffect(() => {
+    if (!mapInstanceRef.current) return;
+
+    const handleMoveEnd = () => {
+      mapInstanceRef.current._userMoved = true;
+    };
+
+    mapInstanceRef.current.on("moveend", handleMoveEnd);
+
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.un("moveend", handleMoveEnd);
+      }
+    };
+  }, []);
+
+  return <div ref={mapRef} className="map-container" />;
 }
 
 export default MapComponent;

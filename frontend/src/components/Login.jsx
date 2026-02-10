@@ -1,7 +1,7 @@
-import React, { useState } from "react";
 import axios from "axios";
+import React, { useState } from "react";
 import SpotlightText from "./ui/SpotlightText";
-import SecurityCamera from "../components/SecurityCamera";
+// import SecurityCamera from "../components/SecurityCamera";
 import "../styles/login.css";
 
 function Login({ onLogin }) {
@@ -69,7 +69,7 @@ function Login({ onLogin }) {
       {/* ═══════════════════════════════════════════════════════════════ */}
       {/* КАМЕРА НАБЛЮДЕНИЯ - верхний левый угол */}
       {/* ═══════════════════════════════════════════════════════════════ */}
-      <SecurityCamera isAlarm={isAlarm} />
+      {/* <SecurityCamera isAlarm={isAlarm} /> */}
 
       <main className="login-content">
         <div className="login-container">

@@ -63,7 +63,7 @@ function Header({ isAuthenticated = false, userRole = null, onLogout }) {
     <header className="universal-header" data-authenticated={isAuthenticated}>
       <div className="header-container">
         <div className="header-logo">
-          <Bot size={28} strokeWidth={2} className="logo-icon" />
+          <Bot size={40} strokeWidth={2.2} className="logo-icon" />
           <span className="logo-text">RoboFleet</span>
         </div>
 

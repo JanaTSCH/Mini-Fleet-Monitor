@@ -111,7 +111,7 @@ function EconomistDashboard({ robots: initialRobots }) {
       {/* Header */}
       <div className="dashboard-header">
         <div className="header-left">
-          <h2>Fleet Economics Dashboard</h2>
+          <h1>Fleet Economics Dashboard</h1>
           <p className="text-secondary">
             Real-time fleet statistics and analytics
           </p>

@@ -1,8 +1,37 @@
 import express from "express";
+import { createClient } from "redis";
 import { pool } from "../config/db.js";
 import { authenticateToken, authorizeRoles } from "../middleware/auth.js";
 
 const router = express.Router();
+
+// REDIS SETUP
+
+const redisClient = createClient({
+  url: process.env.REDIS_URL || "redis://localhost:6379",
+});
+
+let redisReady = false;
+
+redisClient.on("connect", () => {
+  console.log("🔵 Redis: Connecting...");
+});
+
+redisClient.on("ready", () => {
+  console.log("✅ Redis: Connected and ready!");
+  redisReady = true;
+});
+
+redisClient.on("error", (err) => {
+  console.error("❌ Redis error:", err.message);
+  redisReady = false;
+});
+
+redisClient.connect().catch((err) => {
+  console.error("❌ Failed to connect to Redis:", err.message);
+});
+
+// ROUTES
 
 // GET /robots
 router.get("/", authenticateToken, async (req, res) => {
@@ -63,18 +92,88 @@ router.delete(
   }
 );
 
-// GET /robots/:id/history
+// GET /robots/:id/history - WITH REDIS CACHE
+
 router.get("/:id/history", authenticateToken, async (req, res) => {
+  const { id } = req.params;
+  const cacheKey = `robot:history:${id}`;
+
   try {
-    const { id } = req.params;
+    console.log(`[Robot ${id}] Redis ready: ${redisReady}`);
+
+    // FALLBACK: Redis not ready → use DB only
+
+    if (!redisReady) {
+      console.log(`[Robot ${id}] Redis not ready, using DB only`);
+      const result = await pool.query(
+        "SELECT lat, lon, recorded_at FROM robot_positions WHERE robot_id = $1 ORDER BY recorded_at DESC LIMIT 20",
+        [id]
+      );
+
+      res.set("X-Cache-Status", "MISS");
+      res.set("X-Cache-TTL", "0");
+      console.log(
+        `✅ [Robot ${id}] History from DB (Redis unavailable): ${result.rows.length} positions`
+      );
+      return res.json(result.rows);
+    }
+
+    // CHECK CACHE
+
+    console.log(`[Robot ${id}] ... Checking cache: ${cacheKey}`);
+    const cached = await redisClient.get(cacheKey);
+    console.log(`[Robot ${id}] Cache result: ${cached ? "HIT" : "MISS"}`);
+
+    if (cached) {
+      // CACHE HIT
+
+      const ttl = await redisClient.ttl(cacheKey);
+      console.log(`[Robot ${id}] TTL: ${ttl}s remaining`);
+
+      res.set("X-Cache-Status", "HIT");
+      res.set("X-Cache-TTL", ttl.toString());
+
+      console.log(
+        `✅ [Robot ${id}] History from CACHE (TTL: ${ttl}s): ${
+          JSON.parse(cached).length
+        } positions`
+      );
+      return res.json(JSON.parse(cached));
+    }
+
+    // CACHE MISS → Fetch from DB
+
+    console.log(`[Robot ${id}] Fetching from DB...`);
     const result = await pool.query(
-      "SELECT * FROM robot_positions WHERE robot_id = $1 ORDER BY recorded_at DESC LIMIT 50",
+      "SELECT lat, lon, recorded_at FROM robot_positions WHERE robot_id = $1 ORDER BY recorded_at DESC LIMIT 20",
       [id]
+    );
+
+    console.log(`[Robot ${id}] DB returned: ${result.rows.length} positions`);
+
+    // SAVE TO CACHE (30 seconds)
+
+    const ttl = 30;
+    const dataToCache = JSON.stringify(result.rows);
+
+    console.log(`[Robot ${id}] Saving to cache (TTL: ${ttl}s)...`);
+    const setResult = await redisClient.setEx(cacheKey, ttl, dataToCache);
+    console.log(`[Robot ${id}] SetEx result: ${setResult}`);
+
+    // Verify saved
+    const verify = await redisClient.get(cacheKey);
+    console.log(`[Robot ${id}] Verify saved: ${verify ? "YES" : "NO"}`);
+
+    res.set("X-Cache-Status", "MISS");
+    res.set("X-Cache-TTL", ttl.toString());
+
+    console.log(
+      `✅ [Robot ${id}] History from DB, cached for ${ttl}s: ${result.rows.length} positions`
     );
     res.json(result.rows);
   } catch (error) {
-    console.error("Failed to fetch history:", error);
-    res.status(500).json({ error: "Failed to fetch history" });
+    console.error(`❌ [Robot ${id}] Error:`, error.message);
+    res.status(500).json({ error: "Server error" });
   }
 });
 

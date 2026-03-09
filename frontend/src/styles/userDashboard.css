@@ -16,7 +16,7 @@
 }
 
 .dashboard-header h1 {
-  color: rgb(var(--text-primary));
+  color: rgb(var(--text-secondary));
   margin-bottom: var(--space-1);
 }
 
@@ -440,7 +440,7 @@
      ═══════════════════════════════════════════════════════════════════════ */
 
 [data-theme="dark"] .widget {
-  background: rgba(var(--surface), 0.95);
+  /* background: rgba(var(--surface), 0.95); */
   border-color: rgba(var(--border), 0.5);
 }
 

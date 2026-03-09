@@ -145,6 +145,9 @@ function UserDashboard({ robots, fetchRobots }) {
       <div className="dashboard-header">
         <div>
           <h1 className="text-3xl font-bold">My RoboFleet Dashboard</h1>
+          <p className="text-secondary">
+            Real-time fleet monitoring and management
+          </p>
         </div>
         <button className="btn-ghost">
           <Download size={16} />

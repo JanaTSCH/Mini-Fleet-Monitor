@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import axios from "axios";
 import SpotlightText from "./ui/SpotlightText";
+import SecurityCamera from "../components/SecurityCamera";
 import "../styles/login.css";
 
 function Login({ onLogin }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isAlarm, setIsAlarm] = useState(false); // ← Для тревоги при ошибке
 
   const roles = [
     {
@@ -40,6 +42,7 @@ function Login({ onLogin }) {
 
   const handleRoleClick = async (role) => {
     setError("");
+    setIsAlarm(false);
     setLoading(true);
 
     try {
@@ -53,6 +56,8 @@ function Login({ onLogin }) {
       onLogin(response.data.token);
     } catch (err) {
       setError(err.response?.data?.message || "Login failed. Check backend.");
+      setIsAlarm(true); // ← Включаем тревогу!
+      setTimeout(() => setIsAlarm(false), 2000);
       setLoading(false);
     }
   };
@@ -61,13 +66,18 @@ function Login({ onLogin }) {
     <div className="login-page">
       <div className="login-bg"></div>
 
+      {/* ═══════════════════════════════════════════════════════════════ */}
+      {/* КАМЕРА НАБЛЮДЕНИЯ - верхний левый угол */}
+      {/* ═══════════════════════════════════════════════════════════════ */}
+      <SecurityCamera isAlarm={isAlarm} />
+
       <main className="login-content">
         <div className="login-container">
           <div className="login-brand">
             <SpotlightText
               className="login-brand-title"
-              glowColor="#DC2626"
-              baseColor="#bac1c5"
+              glowColor="#fb3131"
+              baseColor="#9ebcce9f"
               glowRadius={150}
               activationZone={600}
             >

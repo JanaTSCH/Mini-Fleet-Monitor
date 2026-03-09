@@ -3,8 +3,8 @@ import React, { useRef, useState } from "react";
 export default function SpotlightText({
   children,
   className = "",
-  glowColor = "#DC2626",
-  baseColor = "#99a3b3",
+  glowColor = "#ff3232",
+  baseColor = "#bac4d40",
   glowRadius = 150,
   activationZone = 600,
 }) {

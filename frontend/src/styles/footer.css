@@ -62,7 +62,7 @@
 }
 
 .footer-links a:hover {
-  color: rgb(var(--secondary));
+  color: rgb(var(--color-primary-500));
 }
 
 .footer-links a::after {
@@ -72,7 +72,7 @@
   bottom: -2px;
   width: 0;
   height: 1px;
-  background: rgb(var(--secondary));
+  background: rgb(var(--color-primary-500));
   transition: width var(--transition-fast);
 }
 

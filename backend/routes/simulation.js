@@ -49,12 +49,12 @@ export const startSimulation = async (socketIO) => {
   }, 2000);
 
   isRunning = true;
-  console.log("🤖 Simulation started");
+  console.log("^-^ Robot Simulation started");
 };
 
 export const toggleSimulation = () => {
   isRunning = !isRunning;
-  console.log(isRunning ? "▶️ Simulation resumed" : "⏸️ Simulation paused");
+  console.log(isRunning ? "▶ Simulation resumed" : "|| Simulation paused");
   return isRunning;
 };
 

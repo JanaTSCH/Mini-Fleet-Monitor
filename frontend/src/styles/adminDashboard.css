@@ -351,7 +351,7 @@ button {
 
 .badge.idle {
   background: rgba(163, 163, 163, 0.2);
-  color: rgb(82, 82, 82);
+  color: rgb(135, 135, 135);
 }
 
 .badge.charging {

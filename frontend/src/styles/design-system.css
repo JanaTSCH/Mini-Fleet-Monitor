@@ -11,7 +11,7 @@
   --color-primary-200: 254, 202, 202;
   --color-primary-300: 252, 165, 165;
   --color-primary-400: 248, 113, 113;
-  --color-primary-500: 239, 68, 68; /* Main red */
+  --color-primary-500: 239, 54, 54; /* Main red */
   --color-primary-600: 220, 38, 38; /* Selectel red */
   --color-primary-700: 185, 28, 28;
   --color-primary-800: 153, 27, 27;
@@ -39,7 +39,7 @@
   --color-gray-300: 212, 212, 212;
   --color-gray-400: 163, 163, 163;
   --color-gray-500: 115, 115, 115;
-  --color-gray-600: 82, 82, 82;
+  --color-gray-600: 38, 50, 66; /* deep-blue-gray accent*/
   --color-gray-700: 64, 64, 64;
   --color-gray-800: 38, 38, 38;
   --color-gray-900: 23, 23, 23; /* Deep dark */

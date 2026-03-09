@@ -15,11 +15,9 @@
   will-change: transform;
 }
 
-/* Минимальная анимация для battery saving */
-@media (prefers-reduced-motion: reduce) {
-  .marquee-content {
-    animation: marqueeScrollSlow 60s linear infinite;
-  }
+.marquee-container:hover .marquee-content {
+  /* Пауза при hover на весь контейнер */
+  animation-play-state: paused;
 }
 
 .marquee-item {
@@ -32,10 +30,15 @@
   transition: all var(--transition-base);
 }
 
-/* ⭐ Синий ТОЛЬКО при hover (акцент!) */
 .marquee-item:hover {
-  color: rgb(var(--secondary));
+  color: rgb(var(--color-primary-500));
   transform: scale(1.05);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-content {
+    animation: marqueeScrollSlow 60s linear infinite;
+  }
 }
 
 /* Marquee scroll */

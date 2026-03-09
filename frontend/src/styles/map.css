@@ -170,7 +170,7 @@
 }
 
 .ol-layer canvas {
-  filter: grayscale(10%) brightness(0.7) contrast(2.5);
+  filter: brightness(0.7) contrast(2.5);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -263,16 +263,6 @@
 
 [data-theme="dark"] .map-container {
   background: #1a1a1a;
-}
-
-[data-theme="dark"] .map-container::after {
-  background: rgba(0, 0, 0, 0.25);
-}
-
-[data-theme="dark"] .ol-layer canvas {
-  filter: grayscale(10%) brightness(0.65) contrast(3);
-
-  transition: filter 0.3s ease;
 }
 
 /* Dark zoom buttons */
